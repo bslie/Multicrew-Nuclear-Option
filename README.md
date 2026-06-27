@@ -6,7 +6,7 @@ Gunners and Weapon System Officers for Nuclear Option. Simply select a friendly 
 - One button enter/exit
 - Works with AI or Player controlled aircraft
 - Works with all modded aircraft, KAR and BOTE
-- 
+- Auto creates camera entry positions for modded aircraft to allow custom placement of external cameras. Configurable in F1 or config file (see below)
 
 ## How to use ##
 1. Install BepinEx https://github.com/BepInEx/BepInEx
