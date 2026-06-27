@@ -222,20 +222,5 @@ namespace SimpleWSO.Gunner
             LastTurretVectorSent.Clear();
             GunnerWeaponFire.CleanupAll();
         }
-
-        public static string DescribeFire(TurretStation ts)
-        {
-            if (ts == null || ts.Station == null) return "station=null";
-            int ammo = ts.Station.Ammo;
-            int weapons = ts.Station.Weapons?.Count ?? 0;
-            string safety = "?";
-            try
-            {
-                var on = Reflect.Call(ts.Station, "SafetyIsOn", ts.Aircraft);
-                if (on is bool b) safety = b.ToString();
-            }
-            catch (System.Exception e) { safety = "err:" + e.GetType().Name; }
-            return $"station={ts.Number} ammo={ammo} weapons={weapons} safetyOn={safety}";
-        }
     }
 }

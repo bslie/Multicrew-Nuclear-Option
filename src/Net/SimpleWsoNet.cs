@@ -22,6 +22,7 @@ namespace SimpleWSO.Net
     public static class SimpleWsoNet
     {
         private const int MaxSharedTargets = 32;
+        private const byte PresenceProtocol = 1;
         public static bool Initialized { get; private set; }
 
         private static bool _serializersRegistered;
@@ -40,6 +41,8 @@ namespace SimpleWSO.Net
         private static readonly Dictionary<long, float> _lastAimSent = new Dictionary<long, float>();
         private static readonly Dictionary<long, Vector3> _lastAimDirSent = new Dictionary<long, Vector3>();
         private static readonly Dictionary<uint, Aircraft> _ownerSubscribedAircraft = new Dictionary<uint, Aircraft>();
+        private static readonly HashSet<uint> _pilotPresence = new HashSet<uint>();
+        private static uint _lastPresenceAircraftNetId;
 
         // Last target persistentID we replicated per station. The turret-target Cmd is
         // rate-limited by the game, so we only re-send when the gunner's target changes.
@@ -122,6 +125,8 @@ namespace SimpleWSO.Net
             _lastAimSent.Clear();
             _lastAimDirSent.Clear();
             _ownerAppliedTargetId.Clear();
+            _pilotPresence.Clear();
+            _lastPresenceAircraftNetId = 0u;
         }
 
         // ---- serializer registration (manual, no weaver) ----
@@ -135,6 +140,9 @@ namespace SimpleWSO.Net
 
             Writer<GunnerLeaveMsg>.Write = (w, m) => { w.WriteUInt32(m.AircraftNetId); w.WriteByte(m.Station); };
             Reader<GunnerLeaveMsg>.Read = r => new GunnerLeaveMsg { AircraftNetId = r.ReadUInt32(), Station = r.ReadByte() };
+
+            Writer<WsoPresenceMsg>.Write = (w, m) => { w.WriteUInt32(m.AircraftNetId); w.WriteByte(m.Protocol); };
+            Reader<WsoPresenceMsg>.Read = r => new WsoPresenceMsg { AircraftNetId = r.ReadUInt32(), Protocol = r.ReadByte() };
 
             Writer<GunnerFireMsg>.Write = (w, m) =>
             {
@@ -201,6 +209,7 @@ namespace SimpleWSO.Net
                 _registeredClientMessageHandler = handler;
                 handler.RegisterHandler<GunnerJoinMsg>((p, m) => OnJoin(m), true);
                 handler.RegisterHandler<GunnerLeaveMsg>((p, m) => OnLeave(m), true);
+                handler.RegisterHandler<WsoPresenceMsg>((p, m) => OnPresence(m), true);
                 handler.RegisterHandler<GunnerFireMsg>((p, m) => OnFire(m), true);
                 handler.RegisterHandler<TargetShareMsg>((p, m) => OnTargetShare(m), true);
             }
@@ -211,6 +220,7 @@ namespace SimpleWSO.Net
                 _registeredServerMessageHandler = handler;
                 handler.RegisterHandler<GunnerJoinMsg>((p, m) => Relay(m), true);
                 handler.RegisterHandler<GunnerLeaveMsg>((p, m) => Relay(m), true);
+                handler.RegisterHandler<WsoPresenceMsg>((p, m) => Relay(m), true);
                 handler.RegisterHandler<GunnerFireMsg>((p, m) => Relay(m), true);
                 handler.RegisterHandler<TargetShareMsg>((p, m) => Relay(m), true);
             }
@@ -229,6 +239,40 @@ namespace SimpleWSO.Net
 
         public static void SendLeave(uint netId, byte station)
             => Send(new GunnerLeaveMsg { AircraftNetId = netId, Station = station }, Channel.Reliable);
+
+        public static void AnnounceLocalPilotPresence()
+        {
+            if (!ClientReady) return;
+
+            Aircraft aircraft = StationDiscovery.FindLocalAircraft();
+            if (aircraft == null || aircraft.disabled || aircraft.Player == null)
+                return;
+
+            if (_lastPresenceAircraftNetId == aircraft.NetId)
+                return;
+
+            _lastPresenceAircraftNetId = aircraft.NetId;
+            _pilotPresence.Add(aircraft.NetId);
+            Send(new WsoPresenceMsg
+            {
+                AircraftNetId = aircraft.NetId,
+                Protocol = PresenceProtocol
+            }, Channel.Reliable);
+        }
+
+        public static bool HasPilotPresence(Aircraft aircraft)
+        {
+            if (aircraft == null)
+                return false;
+            if (aircraft.LocalSim)
+                return true;
+            if (aircraft.Player == null)
+                return true;
+            if (!Initialized)
+                return false;
+
+            return _pilotPresence.Contains(aircraft.NetId);
+        }
 
         public static void SendAim(uint netId, byte station, Vector3 dir, bool firing, IList<Unit> targets)
         {
@@ -309,6 +353,14 @@ namespace SimpleWSO.Net
             CleanupOwnerStation(m.AircraftNetId, m.Station, ts, restoreStationActive: true);
             if (!HasOwnerStateForAircraft(m.AircraftNetId))
                 UnsubscribeOwnerAircraft(m.AircraftNetId);
+        }
+
+        private static void OnPresence(WsoPresenceMsg m)
+        {
+            if (m.Protocol != PresenceProtocol)
+                return;
+
+            _pilotPresence.Add(m.AircraftNetId);
         }
 
         private static void OnFire(GunnerFireMsg m)

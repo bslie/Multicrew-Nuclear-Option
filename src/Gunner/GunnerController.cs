@@ -24,6 +24,12 @@ namespace SimpleWSO.Gunner
 
         public void TakeAircraft(Aircraft ac)
         {
+            if (!SimpleWsoNet.HasPilotPresence(ac))
+            {
+                Plugin.Log.LogWarning($"[Gunner] Cannot join {StationDiscovery.GetAircraftLabel(ac)}: pilot has not advertised SimpleWSO. AI aircraft do not require this check.");
+                return;
+            }
+
             var stations = StationDiscovery.GetGunnerStations(ac);
             if (stations.Count == 0)
             {
@@ -342,8 +348,6 @@ namespace SimpleWSO.Gunner
             _firing = firing;
             var ts = GunnerState.Current;
             if (ts == null) return;
-
-            Plugin.LogVerbose($"[Fire] {(firing ? "PRESSED" : "released")} - {TurretController.DescribeFire(ts)}");
 
             if (!_isOwner)
                 SimpleWsoNet.SendFire(ts.Aircraft.NetId, ts.Number, firing, GunnerState.TargetList);

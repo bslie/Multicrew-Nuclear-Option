@@ -71,6 +71,10 @@ namespace SimpleWSO
                         SimpleWsoNet.TryInit();
                     }
                 }
+                else
+                {
+                    SimpleWsoNet.AnnounceLocalPilotPresence();
+                }
 
                 if (RewiredInput.GetKeyDown(SimpleWsoConfig.ToggleGunnerKey.Value))
                     ToggleGunnerQuick();

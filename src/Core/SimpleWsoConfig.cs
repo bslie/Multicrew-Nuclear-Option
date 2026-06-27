@@ -69,7 +69,7 @@ namespace SimpleWSO.Core
             ReplaceSharedTargets = cfg.Bind("Behaviour", "ReplaceSharedTargets", false,
                 "Replace the other seat's targets when sharing (ShareTargetsKey). When false, shared targets are merged.");
             VerboseLogging = cfg.Bind("Behaviour", "VerboseLogging", false,
-                "Extra debug logging for view state, fire diagnostics, and gunner input.");
+                "Extra debug logging for view state and gunner input.");
 
             foreach (string aircraftKey in BaselineCameraOffsets.Keys)
             {

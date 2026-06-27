@@ -19,6 +19,13 @@ namespace SimpleWSO.Net
         public byte Station;
     }
 
+    /// <summary>Owner/client presence signal used to prove a player-piloted aircraft can receive gunner input.</summary>
+    public struct WsoPresenceMsg
+    {
+        public uint AircraftNetId;
+        public byte Protocol;
+    }
+
     /// <summary>Reliable station control frame: aim direction, fire state, and target snapshot.</summary>
     public struct GunnerFireMsg
     {

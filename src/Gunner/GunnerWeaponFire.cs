@@ -13,7 +13,6 @@ namespace SimpleWSO.Gunner
     public static class GunnerWeaponFire
     {
         private static int _authorizeDepth;
-        private static float _lastFireLog;
         private static int _cleanupToken;
         private static readonly HashSet<WeaponStation> ActiveSalvos = new HashSet<WeaponStation>();
 
@@ -58,12 +57,10 @@ namespace SimpleWSO.Gunner
             _authorizeDepth++;
             try
             {
-                int before = ts.Station.Ammo;
                 Unit target = targetOverride ?? GunnerState.PrimaryTarget();
                 List<Unit> targets = salvoTargets != null
                     ? TargetListUtil.ValidTargets(salvoTargets)
                     : TargetListUtil.ValidTargets(GunnerState.TargetList);
-                string path;
 
                 WeaponInfo info = ts.Station.WeaponInfo;
                 if (info != null && !info.gun && info.fireInterval != 0f && !info.sling)
@@ -76,14 +73,12 @@ namespace SimpleWSO.Gunner
                             ActiveSalvos.Add(ts.Station);
                             Plugin.Instance.StartCoroutine(SalvoLaunch(ts, targets, info.fireInterval * 1.1f, _cleanupToken));
                         }
-                        path = $"SalvoLaunch({targets.Count})";
                     }
                     else
                     {
                         if (target != null)
                             TurretController.ApplyWeaponTargets(ts, target);
                         LaunchSingleMount(ts, target);
-                        path = "LaunchMount";
                     }
                 }
                 else
@@ -92,13 +87,6 @@ namespace SimpleWSO.Gunner
                         TurretController.ApplyWeaponTargets(ts, target);
                     ClearGunnerGunSafety(ts);
                     ts.Station.Fire(ts.Aircraft, target);
-                    path = "WeaponStation.Fire";
-                }
-
-                if (Time.time - _lastFireLog > 1f)
-                {
-                    _lastFireLog = Time.time;
-                    Plugin.LogVerbose($"[Fire] {path} station={ts.Number} target={(target != null ? target.name : "none")} ammoBefore={before} ammoAfter={ts.Station.Ammo}");
                 }
             }
             finally
@@ -130,9 +118,7 @@ namespace SimpleWSO.Gunner
                     if (target != null && !target.disabled && ts.Station.Ready())
                     {
                         if (StationSafetyBlocksFire(ts)) yield break;
-                        int before = ts.Station.Ammo;
                         LaunchSingleMount(ts, target);
-                        Plugin.LogVerbose($"[Fire] SalvoLaunch station={ts.Number} target={target.name} ammoBefore={before} ammoAfter={ts.Station.Ammo}");
                     }
 
                     if (i < targets.Count - 1)
@@ -178,18 +164,11 @@ namespace SimpleWSO.Gunner
             {
                 object result = Reflect.Call(ts.Station, "SafetyIsOn", ts.Aircraft);
                 if (result is bool safetyOn && safetyOn)
-                {
-                    if (Time.time - _lastFireLog > 1f)
-                    {
-                        _lastFireLog = Time.time;
-                        Plugin.LogVerbose($"[Fire] blocked by station safety station={ts.Number}");
-                    }
                     return true;
-                }
             }
-            catch (System.Exception e)
+            catch
             {
-                Plugin.LogVerbose($"[Fire] Safety check failed station={ts.Number}: {e.GetType().Name}");
+                // Private API; if the check is unavailable, fall through and let vanilla fire handling decide.
             }
 
             return false;
