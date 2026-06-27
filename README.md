@@ -52,4 +52,8 @@ Camera offsets are under **F1 → SimpleWSO → CameraOffsets**. Each aircraft a
 | U | `ShareTargetsKey` | Share targets with the other seat |
 | K | `CycleCameraPositionKey` | Cycle configured gunner camera positions |
 
+Youtube Link to overview:
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/KmdFBY28gDw/0.jpg)](https://www.youtube.com/watch?v=KmdFBY28gDw)
+
 Whole things CC0 do what you want with it.
