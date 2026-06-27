@@ -6,7 +6,7 @@ namespace SimpleWSO.Core
 {
     /// <summary>
     /// Thin wrappers over Harmony AccessTools for reaching the game's private members.
-    /// Cached MemberInfo so the hot paths (per-frame turret access) stay cheap.
+    /// Keep all private-member reflection behind one helper so game API drift is easier to audit.
     /// </summary>
     public static class Reflect
     {

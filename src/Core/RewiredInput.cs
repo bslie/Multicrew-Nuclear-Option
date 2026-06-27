@@ -22,13 +22,6 @@ namespace SimpleWSO.Core
             var kb = Kb; return kb != null && kb.GetKeyDown(key);
         }
 
-        public static bool GetKey(KeyCode key)
-        {
-            if (!Ready) return false;
-            if (TryMouseButton(key, out int btn)) { var m = Ms; return m != null && m.GetButton(btn); }
-            var kb = Kb; return kb != null && kb.GetKey(key);
-        }
-
         /// <summary>
         /// Poll a named Rewired action the same way vanilla PilotPlayerState does (timed press up).
         /// Used for "Next Weapon" / "Previous Weapon" while in gunner mode.

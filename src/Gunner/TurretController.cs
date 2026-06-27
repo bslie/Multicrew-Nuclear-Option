@@ -12,7 +12,6 @@ namespace SimpleWSO.Gunner
         private static readonly HashSet<Turret> ManualTurrets = new HashSet<Turret>();
         private static readonly Dictionary<long, float> LastTurretVectorSent = new Dictionary<long, float>();
 
-        internal static bool AllowTurretTargetSet { get; private set; }
         internal static bool AllowTurretAimAuthority { get; private set; }
 
         /// <summary>Put every turret on the station into manual mode.</summary>
@@ -57,9 +56,7 @@ namespace SimpleWSO.Gunner
             catch
             {
                 // Fall back to vanilla clear when the field layout differs.
-                AllowTurretTargetSet = true;
-                try { turret.SetTarget(PersistentID.None, stationNumber); }
-                finally { AllowTurretTargetSet = false; }
+                turret.SetTarget(PersistentID.None, stationNumber);
             }
         }
 
@@ -98,10 +95,6 @@ namespace SimpleWSO.Gunner
             finally { AllowTurretAimAuthority = false; }
             LastTurretVectorSent[key] = now;
         }
-
-        /// <summary>Aim the station's turrets along a world-space direction.</summary>
-        public static void Aim(TurretStation ts, Vector3 worldDir)
-            => Aim(ts, worldDir, GunnerState.PrimaryTarget());
 
         /// <summary>
         /// Aim with an explicit target for station weapons. When <paramref name="driveTurretAim"/>
@@ -145,16 +138,8 @@ namespace SimpleWSO.Gunner
             if (ts == null || !ts.HasTurret) return;
 
             PersistentID id = target != null ? target.persistentID : PersistentID.None;
-            AllowTurretTargetSet = true;
-            try
-            {
-                foreach (var turret in ts.Turrets)
-                    turret?.SetTarget(id, ts.Number);
-            }
-            finally
-            {
-                AllowTurretTargetSet = false;
-            }
+            foreach (var turret in ts.Turrets)
+                turret?.SetTarget(id, ts.Number);
         }
 
         public static void ApplyWeaponTargets(TurretStation ts, Unit target)
@@ -192,23 +177,15 @@ namespace SimpleWSO.Gunner
             return true;
         }
 
-        public static void ApplyStationTarget(TurretStation ts, Unit target, bool applyTurretLock = true)
+        public static void ApplyStationTarget(TurretStation ts, Unit target)
         {
             ApplyWeaponTargets(ts, target);
 
-            if (!applyTurretLock || !ts.HasTurret || ts.Aircraft == null) return;
+            if (ts == null || !ts.HasTurret || ts.Aircraft == null) return;
 
             PersistentID id = target != null ? target.persistentID : PersistentID.None;
-            AllowTurretTargetSet = true;
-            try
-            {
-                for (byte i = 0; i < ts.Turrets.Count; i++)
-                    ts.Aircraft.SetStationTurretTarget(ts.Number, i, id);
-            }
-            finally
-            {
-                AllowTurretTargetSet = false;
-            }
+            for (byte i = 0; i < ts.Turrets.Count; i++)
+                ts.Aircraft.SetStationTurretTarget(ts.Number, i, id);
         }
 
         public static void CleanupAll()

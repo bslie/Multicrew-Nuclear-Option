@@ -270,15 +270,6 @@ namespace SimpleWSO.Gunner
             BindGunnerCockpitUi(ts);
         }
 
-        public bool IsAttachedTo(Aircraft aircraft)
-        {
-            if (!_active || aircraft == null) return false;
-            var csm = CameraStateManager.i;
-            return csm != null &&
-                   csm.followingUnit == aircraft &&
-                   csm.currentState == csm.cockpitState;
-        }
-
         public void Reattach(TurretStation ts)
         {
             if (!_active || ts == null || ts.Aircraft == null) return;
@@ -290,7 +281,7 @@ namespace SimpleWSO.Gunner
             if (csm.cockpitState != null)
                 csm.SwitchState(csm.cockpitState);
             SetupCockpitUi(ts);
-            Plugin.Log.LogInfo($"[View] Reattached cockpit view to unit {ts.Aircraft.NetId}.");
+            Plugin.LogVerbose($"[View] Reattached cockpit view to unit {ts.Aircraft.NetId}.");
         }
 
         /// <summary>

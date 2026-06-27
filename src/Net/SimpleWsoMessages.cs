@@ -35,6 +35,7 @@ namespace SimpleWSO.Net
         public float X;
         public float Y;
         public float Z;
+        // Historical name: these are Unit persistent IDs, not Mirage NetIds.
         public uint[] TargetNetIds;
     }
 
@@ -47,6 +48,7 @@ namespace SimpleWSO.Net
         public uint AircraftNetId;
         public byte Direction;
         public bool Replace;
+        // Historical name: these are Unit persistent IDs, not Mirage NetIds.
         public uint[] TargetNetIds;
     }
 }

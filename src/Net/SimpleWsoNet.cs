@@ -117,6 +117,8 @@ namespace SimpleWSO.Net
             Initialized = false;
             _client = null;
             _server = null;
+            _registeredClientMessageHandler = null;
+            _registeredServerMessageHandler = null;
             UnsubscribeOwnerAircraft();
             _ownerAim.Clear();
             _ownerTargetNetIds.Clear();
@@ -325,7 +327,7 @@ namespace SimpleWSO.Net
                 Replace = replace,
                 TargetNetIds = ids
             }, Channel.Reliable);
-            Plugin.Log.LogInfo($"[Targets] Shared {ids.Length} target(s), direction={direction}, replace={replace}, aircraft={aircraft.NetId}.");
+            Plugin.LogVerbose($"[Targets] Shared {ids.Length} target(s), direction={direction}, replace={replace}, aircraft={aircraft.NetId}.");
         }
 
         private static void Send<T>(T msg, Channel channel)
@@ -471,6 +473,10 @@ namespace SimpleWSO.Net
             if (aircraft == null) return;
 
             uint netId = aircraft.NetId;
+            _pilotPresence.Remove(netId);
+            if (_lastPresenceAircraftNetId == netId)
+                _lastPresenceAircraftNetId = 0u;
+
             var stationLookup = new Dictionary<byte, TurretStation>();
             foreach (var station in StationDiscovery.GetGunnerStations(aircraft))
             {
@@ -612,26 +618,11 @@ namespace SimpleWSO.Net
             return ResolveTargets(netIds);
         }
 
-        private static Unit ResolveOwnerTarget(long key)
-        {
-            var targets = ResolveOwnerTargets(key);
-            return targets.Count > 0 ? targets[0] : null;
-        }
-
-        private static Unit ResolveTarget(uint netId)
-        {
-            if (netId == 0 || _client == null || _client.World == null) return null;
-            if (!_client.World.TryGetIdentity(netId, out var identity) || identity == null) return null;
-
-            var unit = identity.GetComponent<Unit>();
-            return unit != null && !unit.disabled ? unit : null;
-        }
-
         private static uint[] BuildTargetIds(IList<Unit> targets)
             => TargetListUtil.BuildPersistentIds(targets, MaxSharedTargets);
 
-        private static List<Unit> ResolveTargets(uint[] targetNetIds)
-            => TargetListUtil.ResolvePersistentIds(targetNetIds);
+        private static List<Unit> ResolveTargets(uint[] targetPersistentIds)
+            => TargetListUtil.ResolvePersistentIds(targetPersistentIds);
 
         private static void ApplyTargetsToPilot(Aircraft aircraft, List<Unit> targets, bool replace)
         {
@@ -654,7 +645,7 @@ namespace SimpleWSO.Net
                 else aircraft.weaponManager.AddTargetList(target);
             }
 
-            Plugin.Log.LogInfo($"[Targets] Applied {targets.Count} shared target(s) to pilot list. replace={replace}");
+            Plugin.LogVerbose($"[Targets] Applied {targets.Count} shared target(s) to pilot list. replace={replace}");
         }
 
         private static void ApplyTargetsToGunner(List<Unit> targets, bool replace)
@@ -674,7 +665,7 @@ namespace SimpleWSO.Net
                 else GunnerState.TargetList.Add(target);
             }
 
-            Plugin.Log.LogInfo($"[Targets] Applied {targets.Count} shared target(s) to gunner list. replace={replace}");
+            Plugin.LogVerbose($"[Targets] Applied {targets.Count} shared target(s) to gunner list. replace={replace}");
         }
     }
 }

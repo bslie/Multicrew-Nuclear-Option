@@ -85,7 +85,7 @@ namespace SimpleWSO.Gunner
                 ? $"netId={ownPlane.NetId} (your stick still flies YOUR plane, not the gunner target)"
                 : "none";
             Plugin.Log.LogInfo($"[Gunner] Took {ts.Label} on aircraft netId={ac.NetId}. isOwner={_isOwner}.");
-            Plugin.Log.LogInfo($"[Gunner] Weapon cycle: vanilla 'Next Weapon' / 'Previous Weapon'. Fire: vanilla 'Fire'. Your aircraft: {ownInfo}.");
+            Plugin.LogVerbose($"[Gunner] Weapon cycle: vanilla 'Next Weapon' / 'Previous Weapon'. Fire: vanilla 'Fire'. Your aircraft: {ownInfo}.");
         }
 
         public void CycleStation(int delta)
@@ -173,7 +173,7 @@ namespace SimpleWSO.Gunner
                 if (Time.time >= _nextViewRepairLog)
                 {
                     _nextViewRepairLog = Time.time + 5f;
-                    Plugin.Log.LogWarning("[View] Cockpit camera was detached unexpectedly; reattached.");
+                    Plugin.LogVerbose("[View] Cockpit camera was detached unexpectedly; reattached.");
                 }
             }
             else
@@ -308,7 +308,7 @@ namespace SimpleWSO.Gunner
                 SimpleWsoNet.SendJoin(ts.Aircraft.NetId, ts.Number);
             }
 
-            Plugin.Log.LogInfo($"[Gunner] Selected {ts.Label}");
+            Plugin.LogVerbose($"[Gunner] Selected {ts.Label}");
         }
 
         private void CycleCameraPosition()
@@ -317,12 +317,12 @@ namespace SimpleWSO.Gunner
             if (count <= 1)
             {
                 GunnerState.CameraPositionIndex = 0;
-                Plugin.Log.LogInfo("[View] This aircraft has only one configured gunner camera position.");
+                Plugin.LogVerbose("[View] This aircraft has only one configured gunner camera position.");
                 return;
             }
 
             GunnerState.CameraPositionIndex = (GunnerState.CameraPositionIndex + 1) % count;
-            Plugin.Log.LogInfo($"[View] Gunner camera position {GunnerState.CameraPositionIndex + 1}/{count}.");
+            Plugin.LogVerbose($"[View] Gunner camera position {GunnerState.CameraPositionIndex + 1}/{count}.");
         }
 
         private void ReleaseCurrentStation()
@@ -380,14 +380,7 @@ namespace SimpleWSO.Gunner
         /// </summary>
         private void OnTargetAircraftDisabled(Unit unit)
         {
-            try
-            {
-                _pendingLeaveReason = "target aircraft shot down";
-            }
-            catch (System.Exception e)
-            {
-                Plugin.Log.LogWarning($"[Gunner] onDisableUnit handler error (ignored): {e.GetType().Name}: {e.Message}");
-            }
+            _pendingLeaveReason = "target aircraft shot down";
         }
     }
 }

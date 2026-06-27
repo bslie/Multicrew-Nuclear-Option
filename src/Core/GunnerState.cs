@@ -40,11 +40,5 @@ namespace SimpleWSO.Core
             return null;
         }
 
-        /// <summary>NetId of the primary gunner target, or 0.</summary>
-        public static uint PrimaryTargetNetId()
-        {
-            Unit target = PrimaryTarget();
-            return target != null ? target.NetId : 0;
-        }
     }
 }
