@@ -32,6 +32,7 @@ Every attempt has been made to make this mod as seamless as possible, but there 
 - WSO does not have flight control, a given but it means you can't take over sticks if they need to leave or AFK
 - WSO does not have counter measures, no design reason why they do not, I just did not see it as a priority because the pilot needs SOMETHING to do.
 - I do not know if more than one person can be in an aircraft as a gunner at once. theoretically yes but if not then uhhh don't do that.
+- The Medusa rattles like a motherfucker when you're in the gunner seat and i have no idea why but its kind of funny.
 
 ## Configuration ## 
 I've set up camera positions (Gunner camera offset cycleable with K) for most of the vanilla two+ seater aircraft. Often placed where the "targeting pod" is on most aircraft e.g. the Cricket, Compass, Chichane. For the Ibis and Tarantula the
