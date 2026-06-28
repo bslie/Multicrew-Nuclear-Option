@@ -57,3 +57,12 @@ Youtube Link to overview:
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/KmdFBY28gDw/0.jpg)](https://www.youtube.com/watch?v=KmdFBY28gDw)
 
 Whole things CC0 do what you want with it.
+
+## Final Words ## 
+This was a fun project, and I'm pretty happy with the results. The Nuclear Option devs have said they're not going to invest any time into WSO/gunnery like this mod or Meteez's Better and more feature-rich mod: https://github.com/Meteez/NOMulticrew/releases. After playing with my mod with friends, I think it's the right call by Shockfront to not add second seating.
+
+Second seating or dedicated gunners make sense in games where the player has significantly more to do, like Jump Ship, Star Citizen, or WWII games where you're crewing a bomber. Modern aircraft and missile warfare is very much select target → fire. In NO the pilot has to do everything themselves, wearing their "evading fire", "fly the aircraft", and "target and shoot at thing" hats all at once, is what makes the game so engaging. Having a second person in your Compass, for example, removes one of those hats and sort of unbalances the whole thing, because now the pilot only has to focus on manoeuvring.
+
+The rotary-wing aircraft benefit the most from multicrew, with the Ibis' guns, the Tarantula's AC-130-lite side gun, and the Chicane's turret. That's because they push more towards the aforementioned games, where operating the turret and the complexity of piloting naturally split the workload so both players have meaningful things to do instead of one detracting from the other's experience.
+
+It's fun to fantasise about multiple people in a fighter coordinating attacks, independently launching missiles at different targets, and operating like a well-oiled machine. But Nuclear Option's gameplay doesn't really lend itself to that. There's a reason the majority of the airframes in this game, and most modern real-life fighters, are single-seaters. It's not the 40s anymore where a B-17 is engaging 3 different aircraft with its gunners while trying to line up on a bombing target while the flight engineer putting out a fire from a stray tracer.
