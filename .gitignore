@@ -1,0 +1,34 @@
+# Build outputs
+bin/
+obj/
+dist/
+*.dll
+*.pdb
+*.exe
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# NuGet
+*.nupkg
+**/packages/
+project.lock.json
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local / secrets
+*.log
+.env
+.env.*
+
+# Machine-specific game path for IDE / builds
+Directory.Build.props.user

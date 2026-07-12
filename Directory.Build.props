@@ -1,0 +1,28 @@
+<Project>
+  <!--
+    Machine-local overrides (optional): create Directory.Build.props.user next to this file:
+      <Project>
+        <PropertyGroup>
+          <GamePath>D:\Games\Nuclear Option</GamePath>
+        </PropertyGroup>
+      </Project>
+    That file is gitignored.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.props.user"
+          Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.props.user')" />
+
+  <!-- Auto-detect Nuclear Option so IDE / `dotnet build` resolve game + BepInEx refs. -->
+  <PropertyGroup>
+    <GamePath Condition="'$(GamePath)' == '' and Exists('W:\Steam\steamapps\common\Nuclear Option\NuclearOption_Data\Managed\Assembly-CSharp.dll')">W:\Steam\steamapps\common\Nuclear Option</GamePath>
+    <GamePath Condition="'$(GamePath)' == '' and Exists('C:\Program Files (x86)\Steam\steamapps\common\Nuclear Option\NuclearOption_Data\Managed\Assembly-CSharp.dll')">C:\Program Files (x86)\Steam\steamapps\common\Nuclear Option</GamePath>
+    <GamePath Condition="'$(GamePath)' == '' and Exists('D:\Steam\steamapps\common\Nuclear Option\NuclearOption_Data\Managed\Assembly-CSharp.dll')">D:\Steam\steamapps\common\Nuclear Option</GamePath>
+    <GamePath Condition="'$(GamePath)' == '' and Exists('D:\SteamLibrary\steamapps\common\Nuclear Option\NuclearOption_Data\Managed\Assembly-CSharp.dll')">D:\SteamLibrary\steamapps\common\Nuclear Option</GamePath>
+    <GamePath Condition="'$(GamePath)' == '' and Exists('E:\Steam\steamapps\common\Nuclear Option\NuclearOption_Data\Managed\Assembly-CSharp.dll')">E:\Steam\steamapps\common\Nuclear Option</GamePath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GamePath)' != ''">
+    <ManagedPath Condition="'$(ManagedPath)' == ''">$(GamePath)\NuclearOption_Data\Managed</ManagedPath>
+    <BepInExCore Condition="'$(BepInExCore)' == ''">$(GamePath)\BepInEx\core</BepInExCore>
+    <PluginsPath Condition="'$(PluginsPath)' == ''">$(GamePath)\BepInEx\plugins</PluginsPath>
+  </PropertyGroup>
+</Project>
