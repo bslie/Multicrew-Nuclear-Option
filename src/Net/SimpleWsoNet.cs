@@ -43,6 +43,7 @@ namespace SimpleWSO.Net
         private static readonly Dictionary<uint, Aircraft> _ownerSubscribedAircraft = new Dictionary<uint, Aircraft>();
         private static readonly HashSet<uint> _pilotPresence = new HashSet<uint>();
         private static uint _lastPresenceAircraftNetId;
+        private static float _nextPresenceAnnounceTime;
 
         // Last target persistentID we replicated per station. The turret-target Cmd is
         // rate-limited by the game, so we only re-send when the gunner's target changes.
@@ -129,6 +130,7 @@ namespace SimpleWSO.Net
             _ownerAppliedTargetId.Clear();
             _pilotPresence.Clear();
             _lastPresenceAircraftNetId = 0u;
+            _nextPresenceAnnounceTime = 0f;
         }
 
         // ---- serializer registration (manual, no weaver) ----
@@ -247,19 +249,34 @@ namespace SimpleWSO.Net
             if (!ClientReady) return;
 
             Aircraft aircraft = StationDiscovery.FindLocalAircraft();
-            if (aircraft == null || aircraft.disabled || aircraft.Player == null)
+            if (aircraft == null || aircraft.disabled)
+            {
+                _lastPresenceAircraftNetId = 0u;
+                _nextPresenceAnnounceTime = 0f;
+                return;
+            }
+
+            // Re-announce immediately when the local aircraft changes.
+            if (_lastPresenceAircraftNetId != aircraft.NetId)
+            {
+                _lastPresenceAircraftNetId = aircraft.NetId;
+                _nextPresenceAnnounceTime = 0f;
+            }
+
+            // Presence is fire-and-forget with no server-side store, so rebroadcast
+            // periodically for late joiners and clients whose net init raced the first send.
+            if (Time.unscaledTime < _nextPresenceAnnounceTime)
                 return;
 
-            if (_lastPresenceAircraftNetId == aircraft.NetId)
-                return;
-
-            _lastPresenceAircraftNetId = aircraft.NetId;
+            _nextPresenceAnnounceTime = Time.unscaledTime + 1f;
             _pilotPresence.Add(aircraft.NetId);
             Send(new WsoPresenceMsg
             {
                 AircraftNetId = aircraft.NetId,
                 Protocol = PresenceProtocol
             }, Channel.Reliable);
+            Plugin.LogVerbose(
+                $"[Net] Advertised SimpleWSO for aircraft netId={aircraft.NetId}.");
         }
 
         public static bool HasPilotPresence(Aircraft aircraft)
@@ -360,9 +377,18 @@ namespace SimpleWSO.Net
         private static void OnPresence(WsoPresenceMsg m)
         {
             if (m.Protocol != PresenceProtocol)
+            {
+                Plugin.Log.LogWarning(
+                    $"[Net] Ignored presence for aircraft {m.AircraftNetId}: " +
+                    $"protocol={m.Protocol}, expected={PresenceProtocol}.");
                 return;
+            }
 
-            _pilotPresence.Add(m.AircraftNetId);
+            if (_pilotPresence.Add(m.AircraftNetId))
+            {
+                Plugin.Log.LogInfo(
+                    $"[Net] Registered SimpleWSO pilot presence: aircraft netId={m.AircraftNetId}.");
+            }
         }
 
         private static void OnFire(GunnerFireMsg m)
@@ -475,7 +501,10 @@ namespace SimpleWSO.Net
             uint netId = aircraft.NetId;
             _pilotPresence.Remove(netId);
             if (_lastPresenceAircraftNetId == netId)
+            {
                 _lastPresenceAircraftNetId = 0u;
+                _nextPresenceAnnounceTime = 0f;
+            }
 
             var stationLookup = new Dictionary<byte, TurretStation>();
             foreach (var station in StationDiscovery.GetGunnerStations(aircraft))

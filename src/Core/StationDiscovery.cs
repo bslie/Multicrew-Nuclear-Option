@@ -106,10 +106,19 @@ namespace SimpleWSO.Core
 
         /// <summary>
         /// The local player's own aircraft: player-controlled and locally simulated (owner).
-        /// Used by the solo proof and the gunner camera fallback.
+        /// Used by presence advertising and the gunner camera fallback.
         /// </summary>
         public static Aircraft FindLocalAircraft()
         {
+            // Prefer the game's own local-aircraft lookup; reflection is only a fallback
+            // in case field names move under us.
+            if (GameManager.GetLocalAircraft(out Aircraft localAircraft) &&
+                localAircraft != null &&
+                localAircraft.LocalSim)
+            {
+                return localAircraft;
+            }
+
             foreach (var pilot in Object.FindObjectsOfType<Pilot>())
             {
                 if (pilot == null) continue;
