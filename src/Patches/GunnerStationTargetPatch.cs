@@ -1,11 +1,10 @@
 using HarmonyLib;
-using SimpleWSO.Core;
-using SimpleWSO.Gunner;
-using SimpleWSO.Net;
+using MulticrewNuclearOption.Core;
+using MulticrewNuclearOption.Gunner;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SimpleWSO.Patches
+namespace MulticrewNuclearOption.Patches
 {
     /// <summary>
     /// Gunner-station target handling.
@@ -25,7 +24,7 @@ namespace SimpleWSO.Patches
         public static bool Prefix(WeaponStation __instance, Aircraft aircraft, bool isActive)
         {
             if (aircraft == null || aircraft.disabled || __instance == null ||
-                !SimpleWsoNet.IsRemoteGunnerStation(aircraft.NetId, __instance.Number))
+                !MulticrewNet.IsRemoteGunnerStation(aircraft.NetId, __instance.Number))
             {
                 return true;
             }
@@ -51,7 +50,7 @@ namespace SimpleWSO.Patches
         public static bool Prefix(WeaponStation __instance)
         {
             Aircraft ac = StationDiscovery.GetAircraft(__instance);
-            return ac == null || ac.disabled || !SimpleWsoNet.IsRemoteGunnerStation(ac.NetId, __instance.Number);
+            return ac == null || ac.disabled || !MulticrewNet.IsRemoteGunnerStation(ac.NetId, __instance.Number);
         }
     }
 
@@ -60,7 +59,7 @@ namespace SimpleWSO.Patches
     {
         [HarmonyPrefix]
         public static bool Prefix(Aircraft __instance, byte stationIndex)
-            => __instance == null || __instance.disabled || !SimpleWsoNet.IsRemoteGunnerStation(__instance.NetId, stationIndex);
+            => __instance == null || __instance.disabled || !MulticrewNet.IsRemoteGunnerStation(__instance.NetId, stationIndex);
     }
 
     [HarmonyPatch(typeof(Aircraft), "SetTurretVector")]
@@ -74,7 +73,7 @@ namespace SimpleWSO.Patches
 
             return __instance == null ||
                    __instance.disabled ||
-                   !SimpleWsoNet.IsRemoteGunnerStation(__instance.NetId, weaponStationIndex);
+                   !MulticrewNet.IsRemoteGunnerStation(__instance.NetId, weaponStationIndex);
         }
     }
 }

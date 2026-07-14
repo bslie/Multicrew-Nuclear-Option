@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using SimpleWSO.Core;
-using SimpleWSO.Net;
+using MulticrewNuclearOption.Core;
 using UnityEngine;
 
-namespace SimpleWSO.Gunner
+namespace MulticrewNuclearOption.Gunner
 {
     /// <summary>
     /// Shows the pilot the vanilla turret crosshair for a remote gunner-controlled turret
@@ -62,7 +61,7 @@ namespace SimpleWSO.Gunner
                 if (station == null || !station.HasTurret)
                     continue;
 
-                if (!SimpleWsoNet.IsRemoteGunnerStation(aircraft.NetId, station.Number))
+                if (!MulticrewNet.IsRemoteGunnerStation(aircraft.NetId, station.Number))
                     continue;
 
                 // If the pilot has this turret station selected, vanilla HUDTurretState is

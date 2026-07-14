@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// A turret-capable weapon station on an aircraft, plus the handles needed to drive it.

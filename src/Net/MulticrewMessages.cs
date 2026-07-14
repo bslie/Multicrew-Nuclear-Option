@@ -1,9 +1,9 @@
-namespace SimpleWSO.Net
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// Wire messages exchanged between a gunner client and the aircraft owner (relayed by the
     /// server). Kept as flat structs of primitives; serializers are registered manually in
-    /// SimpleWsoNet (no Mirage weaver at mod build time).
+    /// MulticrewNet (no Mirage weaver at mod build time).
     ///
     /// Direction for all of these: gunner-client -> server -> aircraft owner-client.
     /// </summary>

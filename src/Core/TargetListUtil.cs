@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     public static class TargetListUtil
     {

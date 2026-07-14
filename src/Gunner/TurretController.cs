@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using SimpleWSO.Core;
+using MulticrewNuclearOption.Core;
 using UnityEngine;
 
-namespace SimpleWSO.Gunner
+namespace MulticrewNuclearOption.Gunner
 {
     /// <summary>
     /// Drive turret aim and station targets only. Firing goes through GunnerWeaponFire.

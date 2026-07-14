@@ -1,9 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Workspace solution: MulticrewNuclearOption.sln -->
+
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <AssemblyName>SimpleWSO</AssemblyName>
-    <RootNamespace>SimpleWSO</RootNamespace>
+    <AssemblyName>MulticrewNuclearOption</AssemblyName>
+    <RootNamespace>MulticrewNuclearOption</RootNamespace>
     <LangVersion>latest</LangVersion>
     <!-- BepInEx/Unity Mono cannot consume the implicit nullable/annotations; keep it lean. -->
     <Nullable>disable</Nullable>
@@ -67,10 +69,10 @@
   </ItemGroup>
 
   <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(DeployToGame)' == 'true'">
-    <MakeDir Directories="$(PluginsPath)\SimpleWSO" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsPath)\SimpleWSO" SkipUnchangedFiles="false" />
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).pdb" DestinationFolder="$(PluginsPath)\SimpleWSO" SkipUnchangedFiles="false" Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
-    <Message Importance="high" Text="Deployed $(AssemblyName).dll -> $(PluginsPath)\SimpleWSO" />
+    <MakeDir Directories="$(PluginsPath)\MulticrewNuclearOption" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsPath)\MulticrewNuclearOption" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).pdb" DestinationFolder="$(PluginsPath)\MulticrewNuclearOption" SkipUnchangedFiles="false" Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
+    <Message Importance="high" Text="Deployed $(AssemblyName).dll -> $(PluginsPath)\MulticrewNuclearOption" />
   </Target>
 
 </Project>

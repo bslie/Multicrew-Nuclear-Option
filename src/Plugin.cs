@@ -1,19 +1,18 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using SimpleWSO.Core;
-using SimpleWSO.Gunner;
-using SimpleWSO.Net;
+using MulticrewNuclearOption.Core;
+using MulticrewNuclearOption.Gunner;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace SimpleWSO
+namespace MulticrewNuclearOption
 {
     [BepInPlugin(Guid, Name, Version)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "com.bongus.simplewso";
-        public const string Name = "SimpleWSO";
+        public const string Guid = "com.bongus.multicrewnuclearoption";
+        public const string Name = "Multicrew Nuclear Option";
         public const string Version = "1.0.1";
 
         public static ManualLogSource Log;
@@ -21,7 +20,7 @@ namespace SimpleWSO
 
         public static void LogVerbose(string message)
         {
-            if (SimpleWsoConfig.VerboseLogging != null && SimpleWsoConfig.VerboseLogging.Value)
+            if (MulticrewConfig.VerboseLogging != null && MulticrewConfig.VerboseLogging.Value)
                 Log?.LogInfo(message);
         }
 
@@ -37,7 +36,7 @@ namespace SimpleWSO
         {
             Instance = this;
             Log = Logger;
-            SimpleWsoConfig.Bind(Config);
+            MulticrewConfig.Bind(Config);
 
             _gunner = new GunnerController();
             _pilotGunnerReticle = new PilotGunnerTurretReticleOverlay();
@@ -62,24 +61,24 @@ namespace SimpleWSO
                 }
 
                 // Lazily hook the network layer once a session exists; retry periodically.
-                if (!SimpleWsoNet.Initialized)
+                if (!MulticrewNet.Initialized)
                 {
                     _netRetry -= Time.unscaledDeltaTime;
                     if (_netRetry <= 0f)
                     {
                         _netRetry = 2f;
-                        SimpleWsoNet.TryInit();
+                        MulticrewNet.TryInit();
                     }
                 }
                 else
                 {
-                    SimpleWsoNet.AnnounceLocalPilotPresence();
+                    MulticrewNet.AnnounceLocalPilotPresence();
                 }
 
-                if (RewiredInput.GetKeyDown(SimpleWsoConfig.ToggleGunnerKey.Value))
+                if (RewiredInput.GetKeyDown(MulticrewConfig.ToggleGunnerKey.Value))
                     ToggleGunnerQuick();
 
-                if (RewiredInput.GetKeyDown(SimpleWsoConfig.ShareTargetsKey.Value))
+                if (RewiredInput.GetKeyDown(MulticrewConfig.ShareTargetsKey.Value))
                     ShareTargetsQuick();
 
                 _gunner.Update();
@@ -98,8 +97,8 @@ namespace SimpleWSO
         private void FixedUpdate()
         {
             // Owner applies any remote gunner input it has received.
-            if (SimpleWsoNet.Initialized)
-                SimpleWsoNet.OwnerTick();
+            if (MulticrewNet.Initialized)
+                MulticrewNet.OwnerTick();
         }
 
         private void OnDestroy()
@@ -140,7 +139,7 @@ namespace SimpleWSO
                 _gunner?.Leave(reason);
                 _pilotGunnerReticle?.Clear();
                 TurretController.CleanupAll();
-                SimpleWsoNet.Reset();
+                MulticrewNet.Reset();
             }
             catch (System.Exception e)
             {
@@ -159,7 +158,7 @@ namespace SimpleWSO
         private void ToggleGunnerQuick()
         {
             var csm = CameraStateManager.i;
-            LogVerbose($"[GunnerInput] {SimpleWsoConfig.ToggleGunnerKey.Value} pressed active={GunnerState.Active} piloting={StationDiscovery.IsLocalPlayerPiloting()} follow={(csm?.followingUnit != null ? $"{csm.followingUnit.unitName}/net={csm.followingUnit.NetId}" : "null")} state={(csm?.currentState != null ? csm.currentState.GetType().Name : "null")} mapMax={DynamicMap.mapMaximized} cursor={CursorManager.GetFlags()}");
+            LogVerbose($"[GunnerInput] {MulticrewConfig.ToggleGunnerKey.Value} pressed active={GunnerState.Active} piloting={StationDiscovery.IsLocalPlayerPiloting()} follow={(csm?.followingUnit != null ? $"{csm.followingUnit.unitName}/net={csm.followingUnit.NetId}" : "null")} state={(csm?.currentState != null ? csm.currentState.GetType().Name : "null")} mapMax={DynamicMap.mapMaximized} cursor={CursorManager.GetFlags()}");
 
             if (StationDiscovery.IsLocalPlayerPiloting())
             {
@@ -200,11 +199,11 @@ namespace SimpleWSO
 
         private void ShareTargetsQuick()
         {
-            bool replace = SimpleWsoConfig.ReplaceSharedTargets.Value;
+            bool replace = MulticrewConfig.ReplaceSharedTargets.Value;
 
             if (GunnerState.Active && GunnerState.TargetAircraft != null)
             {
-                SimpleWsoNet.ShareTargets(GunnerState.TargetAircraft, TargetShareMsg.GunnerToPilot, replace, GunnerState.TargetList);
+                MulticrewNet.ShareTargets(GunnerState.TargetAircraft, TargetShareMsg.GunnerToPilot, replace, GunnerState.TargetList);
                 return;
             }
 
@@ -214,7 +213,7 @@ namespace SimpleWSO
                 return;
             }
 
-            SimpleWsoNet.ShareTargets(aircraft, TargetShareMsg.PilotToGunner, replace, aircraft.weaponManager.GetTargetList());
+            MulticrewNet.ShareTargets(aircraft, TargetShareMsg.PilotToGunner, replace, aircraft.weaponManager.GetTargetList());
         }
     }
 }

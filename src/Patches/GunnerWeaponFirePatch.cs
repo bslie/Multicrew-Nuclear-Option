@@ -1,7 +1,7 @@
 using HarmonyLib;
-using SimpleWSO.Gunner;
+using MulticrewNuclearOption.Gunner;
 
-namespace SimpleWSO.Patches
+namespace MulticrewNuclearOption.Patches
 {
     /// <summary>
     /// While a gunner station is under mod control, block vanilla WeaponManager / turret

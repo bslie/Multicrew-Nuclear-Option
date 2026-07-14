@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
 using System.Reflection;
-using SimpleWSO.Core;
+using MulticrewNuclearOption.Core;
 using UnityEngine;
 
-namespace SimpleWSO.Gunner
+namespace MulticrewNuclearOption.Gunner
 {
     /// <summary>
     /// Puts the local player into the game's OWN cockpit camera for a chosen aircraft, using

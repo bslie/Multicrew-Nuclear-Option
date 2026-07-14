@@ -4,13 +4,13 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// All tunables for the mod. Bound from BepInEx config so users (and ConfigManager)
     /// can rebind keys without recompiling.
     /// </summary>
-    public static class SimpleWsoConfig
+    public static class MulticrewConfig
     {
         public static ConfigEntry<KeyCode> ToggleGunnerKey;
         public static ConfigEntry<KeyCode> ShareTargetsKey;

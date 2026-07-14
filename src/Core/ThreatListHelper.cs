@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// Helpers for ThreatList missile-alarm audio. Vanilla only stops looping alarms inside

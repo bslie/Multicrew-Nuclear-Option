@@ -1,8 +1,8 @@
 using HarmonyLib;
-using SimpleWSO.Core;
+using MulticrewNuclearOption.Core;
 using UnityEngine;
 
-namespace SimpleWSO.Patches
+namespace MulticrewNuclearOption.Patches
 {
     [HarmonyPatch(typeof(CameraCockpitState), "UpdateState")]
     public static class GunnerCameraOffsetPatch
@@ -15,7 +15,7 @@ namespace SimpleWSO.Patches
             if (cam.followingUnit != GunnerState.TargetAircraft || cam.cameraPivot == null)
                 return;
 
-            Vector3 offset = SimpleWsoConfig.GetCameraOffset(
+            Vector3 offset = MulticrewConfig.GetCameraOffset(
                 GunnerState.TargetAircraft,
                 GunnerState.CameraPositionIndex);
             if (offset == Vector3.zero)

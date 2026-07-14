@@ -3,7 +3,7 @@
 /// safe to ship — ignored when Configuration Manager is not installed.
 /// </summary>
 #pragma warning disable 0169, 0414, 0649
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     internal sealed class ConfigurationManagerAttributes
     {

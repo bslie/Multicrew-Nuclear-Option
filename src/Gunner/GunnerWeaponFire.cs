@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using SimpleWSO.Core;
-using SimpleWSO.Net;
+using MulticrewNuclearOption.Core;
 using UnityEngine;
 
-namespace SimpleWSO.Gunner
+namespace MulticrewNuclearOption.Gunner
 {
     /// <summary>
     /// Single authorized fire path for gunner-selected stations. WeaponStation.Fire is
@@ -30,7 +29,7 @@ namespace SimpleWSO.Gunner
                 return true;
             }
 
-            return SimpleWsoNet.IsRemoteGunnerStation(owner.NetId, station.Number);
+            return MulticrewNet.IsRemoteGunnerStation(owner.NetId, station.Number);
         }
 
         public static bool IsTurretCapableStation(WeaponStation station)

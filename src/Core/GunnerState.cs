@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// Local-machine gunner state. Describes what station (if any) THIS client is

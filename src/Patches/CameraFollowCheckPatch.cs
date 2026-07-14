@@ -1,7 +1,7 @@
 using HarmonyLib;
-using SimpleWSO.Core;
+using MulticrewNuclearOption.Core;
 
-namespace SimpleWSO.Patches
+namespace MulticrewNuclearOption.Patches
 {
     /// <summary>
     /// CameraStateManager.FollowCheck is spectator-oriented: for non-local aircraft it can clear

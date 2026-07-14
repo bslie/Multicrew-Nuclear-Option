@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using HarmonyLib;
 
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// Thin wrappers over Harmony AccessTools for reaching the game's private members.

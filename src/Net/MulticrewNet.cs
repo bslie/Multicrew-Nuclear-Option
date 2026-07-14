@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using Mirage;
 using Mirage.Serialization;
-using SimpleWSO.Core;
-using SimpleWSO.Gunner;
+using MulticrewNuclearOption.Gunner;
 using UnityEngine;
 
-namespace SimpleWSO.Net
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// Custom Mirage transport for gunner input.
@@ -19,7 +18,7 @@ namespace SimpleWSO.Net
     /// failure degrades to "solo only" rather than crashing the mod.
     /// Two-client test checklist: README.
     /// </summary>
-    public static class SimpleWsoNet
+    public static class MulticrewNet
     {
         private const int MaxSharedTargets = 32;
         private const byte PresenceProtocol = 1;
@@ -276,7 +275,7 @@ namespace SimpleWSO.Net
                 Protocol = PresenceProtocol
             }, Channel.Reliable);
             Plugin.LogVerbose(
-                $"[Net] Advertised SimpleWSO for aircraft netId={aircraft.NetId}.");
+                $"[Net] Advertised {Plugin.Name} for aircraft netId={aircraft.NetId}.");
         }
 
         public static bool HasPilotPresence(Aircraft aircraft)
@@ -387,7 +386,7 @@ namespace SimpleWSO.Net
             if (_pilotPresence.Add(m.AircraftNetId))
             {
                 Plugin.Log.LogInfo(
-                    $"[Net] Registered SimpleWSO pilot presence: aircraft netId={m.AircraftNetId}.");
+                    $"[Net] Registered {Plugin.Name} pilot presence: aircraft netId={m.AircraftNetId}.");
             }
         }
 

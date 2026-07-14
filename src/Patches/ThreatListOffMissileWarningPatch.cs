@@ -1,7 +1,7 @@
 using HarmonyLib;
-using SimpleWSO.Core;
+using MulticrewNuclearOption.Core;
 
-namespace SimpleWSO.Patches
+namespace MulticrewNuclearOption.Patches
 {
     /// <summary>
     /// Ensure looping missile-alarm audio stops when a threat ends even if ThreatList's

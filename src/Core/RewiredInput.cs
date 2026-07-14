@@ -1,7 +1,7 @@
 using Rewired;
 using UnityEngine;
 
-namespace SimpleWSO.Core
+namespace MulticrewNuclearOption.Core
 {
     /// <summary>
     /// Input abstraction over Rewired. Nuclear Option drives input through Rewired, and the

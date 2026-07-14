@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using SimpleWSO.Core;
-using SimpleWSO.Net;
+using MulticrewNuclearOption.Core;
 using UnityEngine;
 
-namespace SimpleWSO.Gunner
+namespace MulticrewNuclearOption.Gunner
 {
     /// <summary>
     /// Owns the local player's gunner session: camera, station selection, and routing of
@@ -24,9 +23,9 @@ namespace SimpleWSO.Gunner
 
         public void TakeAircraft(Aircraft ac)
         {
-            if (!SimpleWsoNet.HasPilotPresence(ac))
+            if (!MulticrewNet.HasPilotPresence(ac))
             {
-                Plugin.Log.LogWarning($"[Gunner] Cannot join {StationDiscovery.GetAircraftLabel(ac)}: pilot has not advertised SimpleWSO. AI aircraft do not require this check.");
+                Plugin.Log.LogWarning($"[Gunner] Cannot join {StationDiscovery.GetAircraftLabel(ac)}: pilot has not advertised {Plugin.Name}. AI aircraft do not require this check.");
                 return;
             }
 
@@ -73,7 +72,7 @@ namespace SimpleWSO.Gunner
             _isOwner = ac.LocalSim;
             SubscribeAircraft(ac);
 
-            SimpleWsoConfig.EnsureCameraOffsetsFor(ac);
+            MulticrewConfig.EnsureCameraOffsetsFor(ac);
 
             _view.Enter(stations[stationIndex]);
             SelectStation(stationIndex, skipViewRefresh: true);
@@ -151,7 +150,7 @@ namespace SimpleWSO.Gunner
                 CycleStation(-1);
                 return;
             }
-            if (RewiredInput.GetKeyDown(SimpleWsoConfig.CycleCameraPositionKey.Value))
+            if (RewiredInput.GetKeyDown(MulticrewConfig.CycleCameraPositionKey.Value))
             {
                 CycleCameraPosition();
                 return;
@@ -189,7 +188,7 @@ namespace SimpleWSO.Gunner
             }
             else
             {
-                SimpleWsoNet.SendAim(ts.Aircraft.NetId, ts.Number, dir, _firing, GunnerState.TargetList);
+                MulticrewNet.SendAim(ts.Aircraft.NetId, ts.Number, dir, _firing, GunnerState.TargetList);
                 Unit target = GunnerState.PrimaryTarget();
                 TurretController.ApplyLocalStationTarget(ts, target);
                 if (ts.HasTurret)
@@ -305,7 +304,7 @@ namespace SimpleWSO.Gunner
             }
             else
             {
-                SimpleWsoNet.SendJoin(ts.Aircraft.NetId, ts.Number);
+                MulticrewNet.SendJoin(ts.Aircraft.NetId, ts.Number);
             }
 
             Plugin.LogVerbose($"[Gunner] Selected {ts.Label}");
@@ -313,7 +312,7 @@ namespace SimpleWSO.Gunner
 
         private void CycleCameraPosition()
         {
-            int count = SimpleWsoConfig.GetCameraPositionCount(GunnerState.TargetAircraft);
+            int count = MulticrewConfig.GetCameraPositionCount(GunnerState.TargetAircraft);
             if (count <= 1)
             {
                 GunnerState.CameraPositionIndex = 0;
@@ -334,7 +333,7 @@ namespace SimpleWSO.Gunner
                 if (_isOwner)
                     TurretController.ReleaseManual(ts);
                 else if (ts.Aircraft != null)
-                    SimpleWsoNet.SendLeave(ts.Aircraft.NetId, ts.Number);
+                    MulticrewNet.SendLeave(ts.Aircraft.NetId, ts.Number);
             }
             catch (System.Exception e)
             {
@@ -350,7 +349,7 @@ namespace SimpleWSO.Gunner
             if (ts == null) return;
 
             if (!_isOwner)
-                SimpleWsoNet.SendFire(ts.Aircraft.NetId, ts.Number, firing, GunnerState.TargetList);
+                MulticrewNet.SendFire(ts.Aircraft.NetId, ts.Number, firing, GunnerState.TargetList);
         }
 
         private void SubscribeAircraft(Aircraft ac)

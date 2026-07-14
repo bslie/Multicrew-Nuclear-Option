@@ -1,8 +1,8 @@
 using HarmonyLib;
-using SimpleWSO.Core;
+using MulticrewNuclearOption.Core;
 using System.Collections.Generic;
 
-namespace SimpleWSO.Patches
+namespace MulticrewNuclearOption.Patches
 {
     /// <summary>
     /// Vanilla CombatHUD selection uses CombatHUD.targetList, and in some paths mutates that

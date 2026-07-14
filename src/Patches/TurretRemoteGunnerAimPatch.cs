@@ -1,10 +1,9 @@
 using HarmonyLib;
-using SimpleWSO.Core;
-using SimpleWSO.Gunner;
-using SimpleWSO.Net;
+using MulticrewNuclearOption.Core;
+using MulticrewNuclearOption.Gunner;
 using UnityEngine;
 
-namespace SimpleWSO.Patches
+namespace MulticrewNuclearOption.Patches
 {
     /// <summary>
     /// On the aircraft owner, drive gunner-controlled turrets from networked aim and keep
@@ -29,10 +28,10 @@ namespace SimpleWSO.Patches
                 return true;
 
             byte stationNumber = station.Number;
-            if (!SimpleWsoNet.IsRemoteGunnerStation(aircraft.NetId, stationNumber))
+            if (!MulticrewNet.IsRemoteGunnerStation(aircraft.NetId, stationNumber))
                 return true;
 
-            uint desiredTargetId = SimpleWsoNet.GetRemoteGunnerTargetId(aircraft.NetId, stationNumber);
+            uint desiredTargetId = MulticrewNet.GetRemoteGunnerTargetId(aircraft.NetId, stationNumber);
             if (Reflect.TryGetField<Unit>(__instance, "target", out Unit target) &&
                 target != null &&
                 !target.disabled)
@@ -49,7 +48,7 @@ namespace SimpleWSO.Patches
                 TurretController.ClearTurretTargetLock(__instance, stationNumber);
             }
 
-            if (!SimpleWsoNet.TryGetRemoteGunnerAim(aircraft.NetId, stationNumber, out Vector3 aimDir) ||
+            if (!MulticrewNet.TryGetRemoteGunnerAim(aircraft.NetId, stationNumber, out Vector3 aimDir) ||
                 aimDir.sqrMagnitude < 1e-6f)
                 return false;
 
