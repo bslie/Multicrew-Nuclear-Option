@@ -13,7 +13,7 @@ namespace MulticrewNuclearOption
     {
         public const string Guid = "com.bongus.multicrewnuclearoption";
         public const string Name = "Multicrew Nuclear Option";
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
 
         public static ManualLogSource Log;
         public static Plugin Instance;
