@@ -47,6 +47,9 @@ namespace MulticrewNuclearOption.Core
         // Last target persistentID we replicated per station. The turret-target Cmd is
         // rate-limited by the game, so we only re-send when the gunner's target changes.
         private static readonly Dictionary<long, uint> _ownerAppliedTargetId = new Dictionary<long, uint>();
+        private static readonly Dictionary<long, uint> _gunnerPlayerNetIds = new Dictionary<long, uint>();
+        private static readonly Dictionary<long, GunnerViewStateMsg> _ownerViewStates = new Dictionary<long, GunnerViewStateMsg>();
+        private static readonly Dictionary<long, float> _lastViewStateSent = new Dictionary<long, float>();
 
         private static long Key(uint netId, byte station) => ((long)netId << 8) | station;
 
@@ -127,9 +130,14 @@ namespace MulticrewNuclearOption.Core
             _lastAimSent.Clear();
             _lastAimDirSent.Clear();
             _ownerAppliedTargetId.Clear();
+            _gunnerPlayerNetIds.Clear();
+            _ownerViewStates.Clear();
+            _lastViewStateSent.Clear();
             _pilotPresence.Clear();
             _lastPresenceAircraftNetId = 0u;
             _nextPresenceAnnounceTime = 0f;
+            PilotGunnerMfdFeed.Reset();
+            GunnerKillCredit.Reset();
         }
 
         // ---- serializer registration (manual, no weaver) ----
@@ -138,8 +146,18 @@ namespace MulticrewNuclearOption.Core
             if (_serializersRegistered) return;
             _serializersRegistered = true;
 
-            Writer<GunnerJoinMsg>.Write = (w, m) => { w.WriteUInt32(m.AircraftNetId); w.WriteByte(m.Station); };
-            Reader<GunnerJoinMsg>.Read = r => new GunnerJoinMsg { AircraftNetId = r.ReadUInt32(), Station = r.ReadByte() };
+            Writer<GunnerJoinMsg>.Write = (w, m) =>
+            {
+                w.WriteUInt32(m.AircraftNetId);
+                w.WriteByte(m.Station);
+                w.WriteUInt32(m.GunnerPlayerNetId);
+            };
+            Reader<GunnerJoinMsg>.Read = r => new GunnerJoinMsg
+            {
+                AircraftNetId = r.ReadUInt32(),
+                Station = r.ReadByte(),
+                GunnerPlayerNetId = r.ReadUInt32(),
+            };
 
             Writer<GunnerLeaveMsg>.Write = (w, m) => { w.WriteUInt32(m.AircraftNetId); w.WriteByte(m.Station); };
             Reader<GunnerLeaveMsg>.Read = r => new GunnerLeaveMsg { AircraftNetId = r.ReadUInt32(), Station = r.ReadByte() };
@@ -202,6 +220,58 @@ namespace MulticrewNuclearOption.Core
                     msg.TargetNetIds[i] = r.ReadUInt32();
                 return msg;
             };
+
+            Writer<GunnerViewStateMsg>.Write = (w, m) =>
+            {
+                w.WriteUInt32(m.AircraftNetId);
+                w.WriteByte(m.Station);
+                w.WriteSingle(m.PosX);
+                w.WriteSingle(m.PosY);
+                w.WriteSingle(m.PosZ);
+                w.WriteSingle(m.FwdX);
+                w.WriteSingle(m.FwdY);
+                w.WriteSingle(m.FwdZ);
+                w.WriteSingle(m.UpX);
+                w.WriteSingle(m.UpY);
+                w.WriteSingle(m.UpZ);
+                w.WriteSingle(m.Fov);
+                w.WriteUInt32(m.PrimaryTargetId);
+            };
+            Reader<GunnerViewStateMsg>.Read = r => new GunnerViewStateMsg
+            {
+                AircraftNetId = r.ReadUInt32(),
+                Station = r.ReadByte(),
+                PosX = r.ReadSingle(),
+                PosY = r.ReadSingle(),
+                PosZ = r.ReadSingle(),
+                FwdX = r.ReadSingle(),
+                FwdY = r.ReadSingle(),
+                FwdZ = r.ReadSingle(),
+                UpX = r.ReadSingle(),
+                UpY = r.ReadSingle(),
+                UpZ = r.ReadSingle(),
+                Fov = r.ReadSingle(),
+                PrimaryTargetId = r.ReadUInt32(),
+            };
+
+            Writer<GunnerHitFeedbackMsg>.Write = (w, m) =>
+            {
+                w.WriteUInt32(m.AircraftNetId);
+                w.WriteByte(m.Station);
+                w.WriteSingle(m.HitX);
+                w.WriteSingle(m.HitY);
+                w.WriteSingle(m.HitZ);
+                w.WriteUInt32(m.HitUnitId);
+            };
+            Reader<GunnerHitFeedbackMsg>.Read = r => new GunnerHitFeedbackMsg
+            {
+                AircraftNetId = r.ReadUInt32(),
+                Station = r.ReadByte(),
+                HitX = r.ReadSingle(),
+                HitY = r.ReadSingle(),
+                HitZ = r.ReadSingle(),
+                HitUnitId = r.ReadUInt32(),
+            };
         }
 
         private static void RegisterHandlers()
@@ -215,6 +285,8 @@ namespace MulticrewNuclearOption.Core
                 handler.RegisterHandler<WsoPresenceMsg>((p, m) => OnPresence(m), true);
                 handler.RegisterHandler<GunnerFireMsg>((p, m) => OnFire(m), true);
                 handler.RegisterHandler<TargetShareMsg>((p, m) => OnTargetShare(m), true);
+                handler.RegisterHandler<GunnerViewStateMsg>((p, m) => OnViewState(m), true);
+                handler.RegisterHandler<GunnerHitFeedbackMsg>((p, m) => OnHitFeedback(m), true);
             }
 
             if (_server?.MessageHandler != null && !ReferenceEquals(_registeredServerMessageHandler, _server.MessageHandler))
@@ -226,6 +298,8 @@ namespace MulticrewNuclearOption.Core
                 handler.RegisterHandler<WsoPresenceMsg>((p, m) => Relay(m), true);
                 handler.RegisterHandler<GunnerFireMsg>((p, m) => Relay(m), true);
                 handler.RegisterHandler<TargetShareMsg>((p, m) => Relay(m), true);
+                handler.RegisterHandler<GunnerViewStateMsg>((p, m) => Relay(m), true);
+                handler.RegisterHandler<GunnerHitFeedbackMsg>((p, m) => Relay(m), true);
             }
         }
 
@@ -237,8 +311,8 @@ namespace MulticrewNuclearOption.Core
         }
 
         // ---- gunner-side senders (client -> server) ----
-        public static void SendJoin(uint netId, byte station)
-            => Send(new GunnerJoinMsg { AircraftNetId = netId, Station = station }, Channel.Reliable);
+        public static void SendJoin(uint netId, byte station, uint gunnerPlayerNetId)
+            => Send(new GunnerJoinMsg { AircraftNetId = netId, Station = station, GunnerPlayerNetId = gunnerPlayerNetId }, Channel.Reliable);
 
         public static void SendLeave(uint netId, byte station)
             => Send(new GunnerLeaveMsg { AircraftNetId = netId, Station = station }, Channel.Reliable);
@@ -346,6 +420,96 @@ namespace MulticrewNuclearOption.Core
             Plugin.LogVerbose($"[Targets] Shared {ids.Length} target(s), direction={direction}, replace={replace}, aircraft={aircraft.NetId}.");
         }
 
+        public static void SendViewState(GunnerViewStateMsg msg)
+        {
+            if (!ClientReady || msg.AircraftNetId == 0u)
+                return;
+
+            long key = Key(msg.AircraftNetId, msg.Station);
+            float now = Time.unscaledTime;
+            if (_lastViewStateSent.TryGetValue(key, out float last) && now - last < 1f / 15f)
+                return;
+
+            _lastViewStateSent[key] = now;
+            Send(msg, Channel.Unreliable);
+        }
+
+        public static void SendHitFeedbackFromOwner(uint aircraftNetId, byte station, GlobalPosition hitPosition, Unit hitUnit)
+        {
+            if (!ClientReady)
+                return;
+
+            Send(new GunnerHitFeedbackMsg
+            {
+                AircraftNetId = aircraftNetId,
+                Station = station,
+                HitX = hitPosition.x,
+                HitY = hitPosition.y,
+                HitZ = hitPosition.z,
+                HitUnitId = hitUnit != null ? hitUnit.persistentID.Id : 0u,
+            }, Channel.Unreliable);
+        }
+
+        public static void RegisterGunnerPlayer(long stationKey, uint gunnerPlayerNetId)
+        {
+            if (gunnerPlayerNetId == 0u)
+                return;
+            _gunnerPlayerNetIds[stationKey] = gunnerPlayerNetId;
+        }
+
+        public static void UnregisterGunnerPlayer(long stationKey)
+        {
+            _gunnerPlayerNetIds.Remove(stationKey);
+        }
+
+        public static bool TryGetGunnerPlayerNetId(uint aircraftNetId, byte station, out uint gunnerPlayerNetId)
+        {
+            return _gunnerPlayerNetIds.TryGetValue(Key(aircraftNetId, station), out gunnerPlayerNetId) &&
+                   gunnerPlayerNetId != 0u;
+        }
+
+        public static bool TryGetFiringGunnerStation(uint aircraftNetId, out byte station)
+        {
+            foreach (long key in _ownerFiring)
+            {
+                if ((uint)(key >> 8) != aircraftNetId)
+                    continue;
+
+                station = (byte)(key & 0xFF);
+                if (IsRemoteGunnerStation(aircraftNetId, station))
+                    return true;
+            }
+
+            station = 0;
+            return false;
+        }
+
+        public static System.Collections.Generic.IEnumerable<(byte station, uint gunnerPlayerNetId)> GetActiveRemoteGunnerStations(uint aircraftNetId)
+        {
+            var seen = new HashSet<byte>();
+            foreach (long key in _remoteGunnerStations)
+            {
+                if ((uint)(key >> 8) != aircraftNetId)
+                    continue;
+
+                byte station = (byte)(key & 0xFF);
+                if (!seen.Add(station))
+                    continue;
+
+                _gunnerPlayerNetIds.TryGetValue(key, out uint gunnerNetId);
+                yield return (station, gunnerNetId);
+            }
+        }
+
+        public static uint GetLocalPlayerNetId() => ResolveLocalPlayerNetId();
+
+        private static uint ResolveLocalPlayerNetId()
+        {
+            if (GameManager.GetLocalPlayer(out NuclearOption.Networking.Player localPlayer) && localPlayer != null)
+                return localPlayer.NetId;
+            return 0u;
+        }
+
         private static void Send<T>(T msg, Channel channel)
         {
             if (!ClientReady) return;
@@ -359,7 +523,13 @@ namespace MulticrewNuclearOption.Core
             var ts = ResolveOwned(m.AircraftNetId, m.Station);
             if (ts == null) return;
             SubscribeOwnerAircraft(ts.Aircraft);
-            _remoteGunnerStations.Add(Key(m.AircraftNetId, m.Station));
+            long key = Key(m.AircraftNetId, m.Station);
+            _remoteGunnerStations.Add(key);
+            if (m.GunnerPlayerNetId != 0u)
+            {
+                _gunnerPlayerNetIds[key] = m.GunnerPlayerNetId;
+                GunnerKillCredit.RegisterGunnerStation(m.AircraftNetId, m.Station, m.GunnerPlayerNetId);
+            }
             TurretController.EngageManual(ts);
             TurretController.ReleaseTurretTargetLock(ts);
             Plugin.Log.LogInfo($"[Net] Owner engaged station {m.Station} for remote gunner.");
@@ -418,6 +588,44 @@ namespace MulticrewNuclearOption.Core
                 if (GunnerState.TargetAircraft.NetId != m.AircraftNetId) return;
                 ApplyTargetsToGunner(ResolveTargets(m.TargetNetIds), m.Replace);
             }
+        }
+
+        private static void OnViewState(GunnerViewStateMsg m)
+        {
+            var ac = ResolveOwnedAircraft(m.AircraftNetId);
+            if (ac == null)
+                return;
+
+            long key = Key(m.AircraftNetId, m.Station);
+            _ownerViewStates[key] = m;
+            PilotGunnerMfdFeed.UpdateViewState(m);
+        }
+
+        private static void OnHitFeedback(GunnerHitFeedbackMsg m)
+        {
+            if (!GunnerState.Active || GunnerState.TargetAircraft == null)
+                return;
+            if (GunnerState.TargetAircraft.NetId != m.AircraftNetId)
+                return;
+
+            var ts = GunnerState.Current;
+            if (ts == null || ts.Number != m.Station)
+                return;
+
+            var hud = CombatHUD.i;
+            if (hud == null || hud.aircraft != GunnerState.TargetAircraft)
+                return;
+
+            Unit hitUnit = null;
+            if (m.HitUnitId != 0u)
+            {
+                PersistentID hitId = default;
+                hitId.Id = m.HitUnitId;
+                UnitRegistry.TryGetUnit(hitId, out hitUnit);
+            }
+
+            var hitPosition = new GlobalPosition(m.HitX, m.HitY, m.HitZ);
+            hud.DisplayHit(hitPosition, hitUnit);
         }
 
         /// <summary>Called every FixedUpdate on every client; only does work for owned aircraft.</summary>
@@ -528,6 +736,8 @@ namespace MulticrewNuclearOption.Core
 
             UnsubscribeOwnerAircraft(netId);
 
+            PilotGunnerMfdFeed.ClearAircraft(netId);
+
             if (keys.Count > 0)
                 Plugin.Log.LogInfo($"[Net] Cleared {keys.Count} remote gunner station(s) for aircraft {netId} ({reason}).");
         }
@@ -564,6 +774,11 @@ namespace MulticrewNuclearOption.Core
             _ownerTargetNetIds.Remove(key);
             _ownerFiring.Remove(key);
             _remoteGunnerStations.Remove(key);
+            _gunnerPlayerNetIds.Remove(key);
+            _ownerViewStates.Remove(key);
+            _lastViewStateSent.Remove(key);
+            GunnerKillCredit.UnregisterGunnerStation(netId, station);
+            PilotGunnerMfdFeed.ClearViewState(netId, station);
             bool hadTarget = _ownerAppliedTargetId.TryGetValue(key, out var appliedId) && appliedId != 0u;
             _ownerAppliedTargetId.Remove(key);
 

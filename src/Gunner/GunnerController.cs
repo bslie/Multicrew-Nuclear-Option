@@ -111,6 +111,7 @@ namespace MulticrewNuclearOption.Gunner
                 TurretController.CleanupAll();
 
                 _view.Exit();
+                GunnerCockpitDisplay.Cleanup();
                 GunnerState.Reset();
                 Plugin.Log.LogInfo($"[Gunner] Left station ({reason}).");
             }
@@ -189,6 +190,7 @@ namespace MulticrewNuclearOption.Gunner
             else
             {
                 MulticrewNet.SendAim(ts.Aircraft.NetId, ts.Number, dir, _firing, GunnerState.TargetList);
+                PilotGunnerMfdFeed.SendLocalViewStateIfNeeded();
                 Unit target = GunnerState.PrimaryTarget();
                 TurretController.ApplyLocalStationTarget(ts, target);
                 if (ts.HasTurret)
@@ -304,7 +306,7 @@ namespace MulticrewNuclearOption.Gunner
             }
             else
             {
-                MulticrewNet.SendJoin(ts.Aircraft.NetId, ts.Number);
+                MulticrewNet.SendJoin(ts.Aircraft.NetId, ts.Number, MulticrewNet.GetLocalPlayerNetId());
             }
 
             Plugin.LogVerbose($"[Gunner] Selected {ts.Label}");

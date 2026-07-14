@@ -138,6 +138,7 @@ namespace MulticrewNuclearOption.Gunner
                 _restoreMapMaximized = false;
                 _restoreCombatHud = false;
                 DestroyCockpitUi();
+                GunnerCockpitDisplay.Cleanup();
                 RestoreLaserTargetList();
             }
         }
@@ -311,6 +312,7 @@ namespace MulticrewNuclearOption.Gunner
             ForceCockpitUiState();
             RefreshSupplementalCockpitUi(ac);
             ResetGunnerCameraEffects();
+            GunnerCockpitDisplay.ForceInit(ac);
         }
 
         private void SpawnCockpitUi(Aircraft ac)

@@ -20,6 +20,11 @@ The terms *Gunner* and *WSO* are used interchangeably in this document.
 
 - One-button enter/exit
 - Gunner turret reticle (when a turret is selected) shown on the pilot screen for coordination
+- Gunner sees vanilla cockpit MFDs / sensors (TacScreen, TargetCam) while in the gunner seat
+- Pilot sees the gunner's live camera view on the cockpit target MFD while a gunner station is occupied
+- Hit feedback (impact sound + crosshair marker) for the gunner, including remote gunner clients
+- Kill rewards (XP / funds) split 50/50 between pilot and gunner for gunner-station kills; kill bonus sound plays for both
+- Kill feed shows both crew names (e.g. `Pilot + Gunner destroyed …`) for shared gunner kills
 - Separate target lists for pilot and gunner; can be pushed bi-directionally (Gunner ↔ Pilot)
 - While turrets (Chicane gun, Ibis turrets) are selected by the gunner, the pilot cannot take control — stops the pilot from ripping control while cycling weapons
 - When neither pilot nor gunner is controlling a turret, AI takes over like vanilla
@@ -31,7 +36,7 @@ The terms *Gunner* and *WSO* are used interchangeably in this document.
 ### How to use
 
 1. Install [BepInEx](https://github.com/BepInEx/BepInEx)
-2. Download and place the `MulticrewNuclearOption` folder (containing `MulticrewNuclearOption.dll`) in your Nuclear Option BepInEx plugins folder: `steamapps\common\Nuclear Option\BepInEx\plugins`
+2. Download the latest release from [GitHub Releases](https://github.com/bslie/Multicrew-Nuclear-Option/releases) and place the `MulticrewNuclearOption` folder (containing `MulticrewNuclearOption.dll`) in your Nuclear Option BepInEx plugins folder: `steamapps\common\Nuclear Option\BepInEx\plugins`
 3. Start the game through Nuclear Option Mod Manager (recommended) or Steam
 4. Start or join a multiplayer or singleplayer lobby
 5. Join a faction
@@ -44,7 +49,6 @@ The terms *Gunner* and *WSO* are used interchangeably in this document.
 ### Limitations
 
 - **Both the gunner and the pilot** (unless the pilot is AI) need this mod loaded
-- MFDs do not work for the gunner (they still work for the pilot)
 - WSO does not have flight control
 - WSO does not have countermeasures
 - More than one gunner in the same aircraft is untested
@@ -75,6 +79,19 @@ Overview video:
 License: **CC0** — do what you want with it.
 
 ### Changelog
+
+#### 1.0.3
+
+**Crew displays, combat feedback, and shared rewards**
+
+- **Gunner MFDs / sensors** — `TacScreen` and `TargetCam` now initialize in the gunner seat (fixes black cockpit displays for remote gunners)
+- **Pilot gunner feed** — while a remote gunner station is occupied, the pilot's target MFD shows a live reconstruction of the gunner's camera view (pose streamed over the network; no video upload)
+- **Hit feedback** — gunners get vanilla impact sound and crosshair hit markers; remote gunner clients receive hit feedback via a dedicated network message
+- **Shared kill rewards** — XP and funds from gunner-station kills are split **50/50** between pilot and gunner; both hear the kill bonus sound
+- **Kill feed** — shared gunner kills show both names, e.g. `Pilot + Gunner destroyed …`
+- **Networking** — `GunnerJoinMsg` now carries the gunner's `PlayerNetId` for reward attribution and kill-feed labels
+
+**Install:** extract `MulticrewNuclearOption.zip` into `BepInEx\plugins\`. Both pilot and gunner need this build in multiplayer (AI pilot exempt).
 
 #### 1.0.2
 
@@ -111,6 +128,11 @@ Rotary-wing airframes benefit most (Ibis guns, Tarantula side gun, Chicane turre
 
 - Вход и выход одной кнопкой
 - Прицел турели стрелка (при выбранной турели) отображается на экране пилота для координации
+- У стрелка работают ванильные MFD/сенсоры кабины (TacScreen, TargetCam)
+- Пилот видит на целевом MFD живой ракурс стрелка, пока занята станция стрелка
+- Обратная связь по попаданиям (звук + маркер прицела) у стрелка, в том числе в сетевой игре
+- Награды за уничтожение (опыт / деньги) делятся 50/50 между пилотом и стрелком за киллы со станции стрелка; звук бонуса слышат оба
+- В ленте убийств отображаются оба члена экипажа (например, `Пилот + Стрелок уничтожил …`)
 - Отдельные списки целей у пилота и стрелка; передача в обе стороны (стрелок ↔ пилот)
 - Пока стрелок управляет турелями (пушка Chicane, турели Ibis), пилот не может перехватить управление — это защищает от случайного срыва контроля при переключении оружия
 - Если ни пилот, ни стрелок не управляют турелью, ИИ берёт управление на себя, как в оригинальной игре
@@ -122,7 +144,7 @@ Rotary-wing airframes benefit most (Ibis guns, Tarantula side gun, Chicane turre
 ### Как пользоваться
 
 1. Установите [BepInEx](https://github.com/BepInEx/BepInEx)
-2. Скачайте и поместите папку `MulticrewNuclearOption` (с файлом `MulticrewNuclearOption.dll`) в каталог плагинов: `steamapps\common\Nuclear Option\BepInEx\plugins`
+2. Скачайте последний релиз на [GitHub Releases](https://github.com/bslie/Multicrew-Nuclear-Option/releases) и поместите папку `MulticrewNuclearOption` (с файлом `MulticrewNuclearOption.dll`) в каталог плагинов: `steamapps\common\Nuclear Option\BepInEx\plugins`
 3. Запустите игру через Nuclear Option Mod Manager (рекомендуется) или Steam
 4. Создайте или зайдите в одиночное или сетевое лобби
 5. Выберите фракцию
@@ -135,7 +157,6 @@ Rotary-wing airframes benefit most (Ibis guns, Tarantula side gun, Chicane turre
 ### Ограничения
 
 - **Мод должен быть установлен и у стрелка, и у пилота** (если пилот не ИИ)
-- MFD у стрелка не работают (у пилота работают)
 - WSO не управляет полётом
 - У WSO нет средств противодействия (тепловые ловушки и т. п.)
 - Несколько стрелков в одном самолёте не тестировалось
@@ -166,6 +187,19 @@ Rotary-wing airframes benefit most (Ibis guns, Tarantula side gun, Chicane turre
 Лицензия: **CC0** — используйте как угодно.
 
 ### Список изменений
+
+#### 1.0.3
+
+**Экраны экипажа, обратная связь по бою и общие награды**
+
+- **MFD/сенсоры у стрелка** — `TacScreen` и `TargetCam` инициализируются в кресле стрелка (исправлены чёрные мониторы у удалённого стрелка)
+- **Экран стрелка у пилота** — пока занята удалённая станция стрелка, на целевом MFD пилота показывается живой ракурс стрелка (поза камеры по сети, без передачи видеопотока)
+- **Обратная связь по попаданиям** — у стрелка ванильный звук попадания и маркер на прицеле; удалённые клиенты стрелка получают feedback отдельным сетевым сообщением
+- **Общие награды за килл** — опыт и деньги за уничтожение со станции стрелка делятся **50/50** между пилотом и стрелком; звук бонуса слышат оба
+- **Лента убийств** — при совместном килле отображаются оба имени, например `Пилот + Стрелок уничтожил …`
+- **Сеть** — `GunnerJoinMsg` передаёт `PlayerNetId` стрелка для атрибуции наград и подписи в kill feed
+
+**Установка:** распакуйте `MulticrewNuclearOption.zip` в `BepInEx\plugins\`. В мультиплеере мод нужен и пилоту, и стрелку (самолёт с ИИ-пилотом — исключение).
 
 #### 1.0.2
 

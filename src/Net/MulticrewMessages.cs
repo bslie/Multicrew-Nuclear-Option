@@ -11,6 +11,7 @@ namespace MulticrewNuclearOption.Core
     {
         public uint AircraftNetId;
         public byte Station;
+        public uint GunnerPlayerNetId;
     }
 
     public struct GunnerLeaveMsg
@@ -37,6 +38,35 @@ namespace MulticrewNuclearOption.Core
         public float Z;
         // Historical name: these are Unit persistent IDs, not Mirage NetIds.
         public uint[] TargetNetIds;
+    }
+
+    /// <summary>Gunner camera pose for reconstructing the gunner view on the pilot MFD.</summary>
+    public struct GunnerViewStateMsg
+    {
+        public uint AircraftNetId;
+        public byte Station;
+        public float PosX;
+        public float PosY;
+        public float PosZ;
+        public float FwdX;
+        public float FwdY;
+        public float FwdZ;
+        public float UpX;
+        public float UpY;
+        public float UpZ;
+        public float Fov;
+        public uint PrimaryTargetId;
+    }
+
+    /// <summary>Owner -> gunner hit feedback for remote gunner clients.</summary>
+    public struct GunnerHitFeedbackMsg
+    {
+        public uint AircraftNetId;
+        public byte Station;
+        public float HitX;
+        public float HitY;
+        public float HitZ;
+        public uint HitUnitId;
     }
 
     /// <summary>Explicit target-list handoff between pilot and gunner.</summary>
