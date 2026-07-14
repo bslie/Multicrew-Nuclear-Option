@@ -78,6 +78,18 @@ Overview video:
 
 License: **CC0** — do what you want with it.
 
+### Releases
+
+Download builds from [GitHub Releases](https://github.com/bslie/Multicrew-Nuclear-Option/releases).
+
+| Version | File | Highlights |
+| --- | --- | --- |
+| **1.0.3** (latest) | [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) | Gunner MFDs, pilot gunner feed, hit feedback, 50/50 kill rewards |
+| **1.0.2** | [`MulticrewNuclearOption-v1.0.2.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.2/MulticrewNuclearOption-v1.0.2.zip) | Renamed from SimpleWSO; improved local build setup |
+| **1.0.1** | [`SimpleWSO-v1.0.1.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.1/SimpleWSO-v1.0.1.zip) | Original **SimpleWSO** release |
+
+Extract the zip into `Nuclear Option\BepInEx\plugins\`. Each archive already contains the correct plugin folder (`MulticrewNuclearOption\` or `SimpleWSO\`).
+
 ### Changelog
 
 #### 1.0.3
@@ -91,7 +103,7 @@ License: **CC0** — do what you want with it.
 - **Kill feed** — shared gunner kills show both names, e.g. `Pilot + Gunner destroyed …`
 - **Networking** — `GunnerJoinMsg` now carries the gunner's `PlayerNetId` for reward attribution and kill-feed labels
 
-**Install:** extract `MulticrewNuclearOption.zip` into `BepInEx\plugins\`. Both pilot and gunner need this build in multiplayer (AI pilot exempt).
+**Install:** extract [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) into `BepInEx\plugins\`. Both pilot and gunner need this build in multiplayer (AI pilot exempt).
 
 #### 1.0.2
 
@@ -186,6 +198,18 @@ Rotary-wing airframes benefit most (Ibis guns, Tarantula side gun, Chicane turre
 
 Лицензия: **CC0** — используйте как угодно.
 
+### Релизы
+
+Скачать сборки можно на [GitHub Releases](https://github.com/bslie/Multicrew-Nuclear-Option/releases).
+
+| Версия | Файл | Кратко |
+| --- | --- | --- |
+| **1.0.3** (актуальная) | [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) | MFD стрелка, экран у пилота, hit feedback, награды 50/50 |
+| **1.0.2** | [`MulticrewNuclearOption-v1.0.2.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.2/MulticrewNuclearOption-v1.0.2.zip) | Переименование с SimpleWSO; удобная локальная сборка |
+| **1.0.1** | [`SimpleWSO-v1.0.1.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.1/SimpleWSO-v1.0.1.zip) | Оригинальный релиз **SimpleWSO** |
+
+Распакуйте архив в `Nuclear Option\BepInEx\plugins\`. Внутри уже лежит нужная папка плагина (`MulticrewNuclearOption\` или `SimpleWSO\`).
+
 ### Список изменений
 
 #### 1.0.3
@@ -199,7 +223,7 @@ Rotary-wing airframes benefit most (Ibis guns, Tarantula side gun, Chicane turre
 - **Лента убийств** — при совместном килле отображаются оба имени, например `Пилот + Стрелок уничтожил …`
 - **Сеть** — `GunnerJoinMsg` передаёт `PlayerNetId` стрелка для атрибуции наград и подписи в kill feed
 
-**Установка:** распакуйте `MulticrewNuclearOption.zip` в `BepInEx\plugins\`. В мультиплеере мод нужен и пилоту, и стрелку (самолёт с ИИ-пилотом — исключение).
+**Установка:** распакуйте [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) в `BepInEx\plugins\`. В мультиплеере мод нужен и пилоту, и стрелку (самолёт с ИИ-пилотом — исключение).
 
 #### 1.0.2
 
