@@ -2,6 +2,13 @@ using System.Collections.Generic;
 
 namespace MulticrewNuclearOption.Core
 {
+    public enum GunnerSessionState
+    {
+        Inactive = 0,
+        JoinPending = 1,
+        Active = 2,
+    }
+
     /// <summary>
     /// Local-machine gunner state. Describes what station (if any) THIS client is
     /// currently manning, on which aircraft.
@@ -15,6 +22,11 @@ namespace MulticrewNuclearOption.Core
         public static int StationIndex = -1;
         public static int CameraPositionIndex;
 
+        public static GunnerSessionState SessionState;
+        public static uint PendingRequestId;
+        public static ulong SessionToken;
+        public static uint SessionGeneration;
+
         public static TurretStation Current =>
             (StationIndex >= 0 && StationIndex < Stations.Count) ? Stations[StationIndex] : null;
 
@@ -26,6 +38,10 @@ namespace MulticrewNuclearOption.Core
             TargetList.Clear();
             StationIndex = -1;
             CameraPositionIndex = 0;
+            SessionState = GunnerSessionState.Inactive;
+            PendingRequestId = 0u;
+            SessionToken = 0UL;
+            SessionGeneration = 0u;
         }
 
         /// <summary>First non-disabled target in the gunner list, or null.</summary>

@@ -24,16 +24,16 @@ namespace MulticrewNuclearOption.Gunner
             public GameObject CameraRoot;
             public Camera FeedCamera;
             public RenderTexture FeedTexture;
-            public GunnerViewStateMsg LatestView;
+            public ViewS2C LatestView;
             public bool HasView;
         }
 
         private static readonly Dictionary<long, FeedState> _feeds = new Dictionary<long, FeedState>();
-        private static readonly Dictionary<long, GunnerViewStateMsg> _latestViewStates = new Dictionary<long, GunnerViewStateMsg>();
+        private static readonly Dictionary<long, ViewS2C> _latestViewStates = new Dictionary<long, ViewS2C>();
 
         private static long Key(uint aircraftNetId, byte station) => ((long)aircraftNetId << 8) | station;
 
-        public static void UpdateViewState(GunnerViewStateMsg msg)
+        public static void UpdateViewState(ViewS2C msg)
         {
             long key = Key(msg.AircraftNetId, msg.Station);
             _latestViewStates[key] = msg;
@@ -142,7 +142,7 @@ namespace MulticrewNuclearOption.Gunner
             Vector3 localUp = aircraftTransform.InverseTransformDirection(cameraTransform.up);
             Unit primary = GunnerState.PrimaryTarget();
 
-            MulticrewNet.SendViewState(new GunnerViewStateMsg
+            MulticrewNet.SendViewState(new ViewC2S
             {
                 AircraftNetId = GunnerState.TargetAircraft.NetId,
                 Station = ts.Number,

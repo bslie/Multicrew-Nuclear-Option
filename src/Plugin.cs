@@ -13,7 +13,7 @@ namespace MulticrewNuclearOption
     {
         public const string Guid = "com.bongus.multicrewnuclearoption";
         public const string Name = "Multicrew Nuclear Option";
-        public const string Version = "1.0.3";
+        public const string Version = "1.0.4";
 
         public static ManualLogSource Log;
         public static Plugin Instance;
@@ -73,6 +73,11 @@ namespace MulticrewNuclearOption
                 else
                 {
                     MulticrewNet.AnnounceLocalPilotPresence();
+                    if (MulticrewNet.Initialized && !MulticrewNet.ClientReady)
+                    {
+                        _gunner?.Leave("network disconnected");
+                        MulticrewNet.HandleDisconnect();
+                    }
                 }
 
                 if (RewiredInput.GetKeyDown(MulticrewConfig.ToggleGunnerKey.Value))
@@ -206,7 +211,7 @@ namespace MulticrewNuclearOption
 
             if (GunnerState.Active && GunnerState.TargetAircraft != null)
             {
-                MulticrewNet.ShareTargets(GunnerState.TargetAircraft, TargetShareMsg.GunnerToPilot, replace, GunnerState.TargetList);
+                MulticrewNet.ShareTargets(GunnerState.TargetAircraft, TargetShareDirection.GunnerToPilot, replace, GunnerState.TargetList);
                 return;
             }
 
@@ -216,7 +221,7 @@ namespace MulticrewNuclearOption
                 return;
             }
 
-            MulticrewNet.ShareTargets(aircraft, TargetShareMsg.PilotToGunner, replace, aircraft.weaponManager.GetTargetList());
+            MulticrewNet.ShareTargets(aircraft, TargetShareDirection.PilotToGunner, replace, aircraft.weaponManager.GetTargetList());
         }
     }
 }

@@ -137,6 +137,13 @@ namespace MulticrewNuclearOption.Gunner
                 return;
             }
 
+            if (!_isOwner &&
+                GunnerState.SessionState == GunnerSessionState.Inactive)
+            {
+                Leave("network session ended");
+                return;
+            }
+
             if (!ValidateSession())
                 return;
 
@@ -189,6 +196,9 @@ namespace MulticrewNuclearOption.Gunner
             }
             else
             {
+                if (GunnerState.SessionState != GunnerSessionState.Active)
+                    return;
+
                 MulticrewNet.SendAim(ts.Aircraft.NetId, ts.Number, dir, _firing, GunnerState.TargetList);
                 PilotGunnerMfdFeed.SendLocalViewStateIfNeeded();
                 Unit target = GunnerState.PrimaryTarget();
@@ -335,7 +345,15 @@ namespace MulticrewNuclearOption.Gunner
                 if (_isOwner)
                     TurretController.ReleaseManual(ts);
                 else if (ts.Aircraft != null)
-                    MulticrewNet.SendLeave(ts.Aircraft.NetId, ts.Number);
+                {
+                    if (GunnerState.SessionState == GunnerSessionState.Active)
+                        MulticrewNet.SendLeave(ts.Aircraft.NetId, ts.Number);
+                    else
+                    {
+                        GunnerState.SessionState = GunnerSessionState.Inactive;
+                        GunnerState.PendingRequestId = 0u;
+                    }
+                }
             }
             catch (System.Exception e)
             {
@@ -351,7 +369,11 @@ namespace MulticrewNuclearOption.Gunner
             if (ts == null) return;
 
             if (!_isOwner)
+            {
+                if (GunnerState.SessionState != GunnerSessionState.Active)
+                    return;
                 MulticrewNet.SendFire(ts.Aircraft.NetId, ts.Number, firing, GunnerState.TargetList);
+            }
         }
 
         private void SubscribeAircraft(Aircraft ac)

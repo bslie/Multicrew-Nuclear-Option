@@ -1,50 +1,149 @@
 namespace MulticrewNuclearOption.Core
 {
-    /// <summary>
-    /// Wire messages exchanged between a gunner client and the aircraft owner (relayed by the
-    /// server). Kept as flat structs of primitives; serializers are registered manually in
-    /// MulticrewNet (no Mirage weaver at mod build time).
-    ///
-    /// Direction for all of these: gunner-client -> server -> aircraft owner-client.
-    /// </summary>
-    public struct GunnerJoinMsg
+    public struct HelloC2S
     {
+        public byte WireVersion;
+    }
+
+    public struct HelloS2C
+    {
+        public byte WireVersion;
+    }
+
+    public struct PresenceC2S
+    {
+        public byte WireVersion;
+    }
+
+    public struct PresenceS2C
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public uint PilotPlayerNetId;
+    }
+
+    public struct PresenceRemovedS2C
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+    }
+
+    public struct JoinReqC2S
+    {
+        public byte WireVersion;
         public uint AircraftNetId;
         public byte Station;
+        public uint RequestId;
+    }
+
+    public struct JoinGrantedS2C
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public uint RequestId;
+        public ulong SessionToken;
+        public uint Generation;
         public uint GunnerPlayerNetId;
     }
 
-    public struct GunnerLeaveMsg
+    public struct JoinRejectedS2C
     {
-        public uint AircraftNetId;
-        public byte Station;
+        public byte WireVersion;
+        public uint RequestId;
+        public byte Reason;
     }
 
-    /// <summary>Owner/client presence signal used to prove a player-piloted aircraft can receive gunner input.</summary>
-    public struct WsoPresenceMsg
+    public struct LeaveC2S
     {
-        public uint AircraftNetId;
-        public byte Protocol;
-    }
-
-    /// <summary>Reliable station control frame: aim direction, fire state, and target snapshot.</summary>
-    public struct GunnerFireMsg
-    {
+        public byte WireVersion;
         public uint AircraftNetId;
         public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+    }
+
+    public struct LeaseRevokedS2C
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public byte Reason;
+    }
+
+    public struct LeaseActivatedS2C
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public uint GunnerPlayerNetId;
+    }
+
+    public struct ControlC2S
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public uint Sequence;
         public bool Firing;
         public float X;
         public float Y;
         public float Z;
-        // Historical name: these are Unit persistent IDs, not Mirage NetIds.
-        public uint[] TargetNetIds;
     }
 
-    /// <summary>Gunner camera pose for reconstructing the gunner view on the pilot MFD.</summary>
-    public struct GunnerViewStateMsg
+    public struct ControlS2C
     {
+        public byte WireVersion;
         public uint AircraftNetId;
         public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public uint Sequence;
+        public bool Firing;
+        public float X;
+        public float Y;
+        public float Z;
+    }
+
+    public struct TargetsC2S
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public uint Sequence;
+        public bool Replace;
+        public uint[] TargetIds;
+    }
+
+    public struct TargetsS2C
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public byte Direction;
+        public ulong SessionToken;
+        public uint Generation;
+        public uint Sequence;
+        public bool Replace;
+        public uint[] TargetIds;
+    }
+
+    public struct ViewC2S
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public uint Sequence;
         public float PosX;
         public float PosY;
         public float PosZ;
@@ -58,27 +157,59 @@ namespace MulticrewNuclearOption.Core
         public uint PrimaryTargetId;
     }
 
-    /// <summary>Owner -> gunner hit feedback for remote gunner clients.</summary>
-    public struct GunnerHitFeedbackMsg
+    public struct ViewS2C
     {
+        public byte WireVersion;
         public uint AircraftNetId;
         public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public uint Sequence;
+        public float PosX;
+        public float PosY;
+        public float PosZ;
+        public float FwdX;
+        public float FwdY;
+        public float FwdZ;
+        public float UpX;
+        public float UpY;
+        public float UpZ;
+        public float Fov;
+        public uint PrimaryTargetId;
+    }
+
+    public struct HitFeedbackC2S
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
         public float HitX;
         public float HitY;
         public float HitZ;
         public uint HitUnitId;
     }
 
-    /// <summary>Explicit target-list handoff between pilot and gunner.</summary>
-    public struct TargetShareMsg
+    public struct HitFeedbackS2C
     {
-        public const byte GunnerToPilot = 0;
-        public const byte PilotToGunner = 1;
-
+        public byte WireVersion;
         public uint AircraftNetId;
-        public byte Direction;
-        public bool Replace;
-        // Historical name: these are Unit persistent IDs, not Mirage NetIds.
-        public uint[] TargetNetIds;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
+        public float HitX;
+        public float HitY;
+        public float HitZ;
+        public uint HitUnitId;
+    }
+
+    public struct HeartbeatC2S
+    {
+        public byte WireVersion;
+        public uint AircraftNetId;
+        public byte Station;
+        public ulong SessionToken;
+        public uint Generation;
     }
 }

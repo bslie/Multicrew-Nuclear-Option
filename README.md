@@ -84,13 +84,27 @@ Download builds from [GitHub Releases](https://github.com/bslie/Multicrew-Nuclea
 
 | Version | File | Highlights |
 | --- | --- | --- |
-| **1.0.3** (latest) | [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) | Gunner MFDs, pilot gunner feed, hit feedback, 50/50 kill rewards |
+| **1.0.4** (latest) | [`MulticrewNuclearOption-v1.0.4.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.4/MulticrewNuclearOption-v1.0.4.zip) | Protocol V2: server auth, lease sessions, network hardening |
+| **1.0.3** | [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) | Gunner MFDs, pilot gunner feed, hit feedback, 50/50 kill rewards |
 | **1.0.2** | [`MulticrewNuclearOption-v1.0.2.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.2/MulticrewNuclearOption-v1.0.2.zip) | Renamed from SimpleWSO; improved local build setup |
 | **1.0.1** | [`SimpleWSO-v1.0.1.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.1/SimpleWSO-v1.0.1.zip) | Original **SimpleWSO** release |
 
 Extract the zip into `Nuclear Option\BepInEx\plugins\`. Each archive already contains the correct plugin folder (`MulticrewNuclearOption\` or `SimpleWSO\`).
 
 ### Changelog
+
+#### 1.0.4
+
+**Network protocol V2 (breaking change)**
+
+- **Server-side authorization** — the listen-host validates every gunner message against the authenticated sender; spoofed join/fire/presence/target messages are rejected
+- **Station lease sessions** — join grants a server-issued token/generation; fire, aim, and view require an active lease; one gunner per station
+- **Targeted delivery** — no more blind `SendToAll` relay; owner and gunner receive only their authorized updates
+- **Lifecycle fixes** — heartbeat + TTL for gunner sessions and pilot presence; fire watchdog clears stuck firing after disconnect; proper handler unregister on reset/reconnect
+- **Channel tuning** — aim, view, and heartbeat use Unreliable; join/leave/target handoff stay Reliable
+- **Input validation** — finite floats, FOV/camera bounds, target list limits, sequence ordering
+
+**Install:** extract [`MulticrewNuclearOption-v1.0.4.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.4/MulticrewNuclearOption-v1.0.4.zip) into `BepInEx\plugins\`. **All players in a session must use 1.0.4** — not compatible with 1.0.3 or earlier.
 
 #### 1.0.3
 
@@ -204,13 +218,27 @@ Rotary-wing airframes benefit most (Ibis guns, Tarantula side gun, Chicane turre
 
 | Версия | Файл | Кратко |
 | --- | --- | --- |
-| **1.0.3** (актуальная) | [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) | MFD стрелка, экран у пилота, hit feedback, награды 50/50 |
+| **1.0.4** (актуальная) | [`MulticrewNuclearOption-v1.0.4.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.4/MulticrewNuclearOption-v1.0.4.zip) | Протокол V2: серверная авторизация, lease-сессии, усиление сети |
+| **1.0.3** | [`MulticrewNuclearOption-v1.0.3.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.3/MulticrewNuclearOption-v1.0.3.zip) | MFD стрелка, экран у пилота, hit feedback, награды 50/50 |
 | **1.0.2** | [`MulticrewNuclearOption-v1.0.2.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.2/MulticrewNuclearOption-v1.0.2.zip) | Переименование с SimpleWSO; удобная локальная сборка |
 | **1.0.1** | [`SimpleWSO-v1.0.1.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.1/SimpleWSO-v1.0.1.zip) | Оригинальный релиз **SimpleWSO** |
 
 Распакуйте архив в `Nuclear Option\BepInEx\plugins\`. Внутри уже лежит нужная папка плагина (`MulticrewNuclearOption\` или `SimpleWSO\`).
 
 ### Список изменений
+
+#### 1.0.4
+
+**Сетевой протокол V2 (несовместимое обновление)**
+
+- **Серверная авторизация** — listen-host проверяет каждое сообщение стрелка по аутентифицированному отправителю; подделки join/fire/presence/target отклоняются
+- **Lease-сессии станций** — join выдаёт token/generation; aim, fire и view работают только при активном lease; один стрелок на станцию
+- **Точечная доставка** — вместо слепого `SendToAll` owner и gunner получают только свои авторизованные обновления
+- **Исправления lifecycle** — heartbeat и TTL для сессий стрелка и presence пилота; watchdog сбрасывает зависший огонь после disconnect; корректная отписка handlers при reset/reconnect
+- **Каналы** — aim, view и heartbeat идут по Unreliable; join/leave и передача целей — по Reliable
+- **Валидация входных данных** — проверка float, FOV/камеры, лимитов целей, порядка sequence
+
+**Установка:** распакуйте [`MulticrewNuclearOption-v1.0.4.zip`](https://github.com/bslie/Multicrew-Nuclear-Option/releases/download/v1.0.4/MulticrewNuclearOption-v1.0.4.zip) в `BepInEx\plugins\`. **Все игроки в сессии должны использовать 1.0.4** — несовместимо с 1.0.3 и более ранними версиями.
 
 #### 1.0.3
 
